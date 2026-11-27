@@ -1,0 +1,9 @@
+{
+  "ejemplos_entrenamiento": 2521,
+  "ejemplos_validacion": 222,
+  "mundos_docentes": 96,
+  "mundos_validacion": 12,
+  "entropia_cruzada_validacion": 1.0792981386184692,
+  "referencia_frecuencias": 2.0221105895217577,
+  "error_max_exportacion": 5.7220458984375e-06
+}

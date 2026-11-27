@@ -1,0 +1,204 @@
+{
+  "niveles": 24,
+  "distintos": 24,
+  "salas": {
+    "5": 4,
+    "6": 6,
+    "7": 10,
+    "8": 4
+  },
+  "ensayos": [
+    {
+      "semilla": 12000,
+      "salas": 5,
+      "pasos_salida": 434,
+      "ida_y_vuelta": 114,
+      "salas_al_reanudar": 2,
+      "sha256": "3da2747df205226ccc20135a67eac6d5920132b9e446b0efd95531a9d5b5c4c5"
+    },
+    {
+      "semilla": 12001,
+      "salas": 6,
+      "pasos_salida": 573,
+      "ida_y_vuelta": 114,
+      "salas_al_reanudar": 3,
+      "sha256": "846cd58debf750be3a8f00775ab394884468b1de46e9511f33354a0846c393db"
+    },
+    {
+      "semilla": 12002,
+      "salas": 7,
+      "pasos_salida": 691,
+      "ida_y_vuelta": 114,
+      "salas_al_reanudar": 3,
+      "sha256": "7b754ca882f83d99a676b87ec11e3cc30b7c5aca2a007c180554ea6a881e22a1"
+    },
+    {
+      "semilla": 12003,
+      "salas": 8,
+      "pasos_salida": 788,
+      "ida_y_vuelta": 114,
+      "salas_al_reanudar": null,
+      "sha256": "7439c3c5ea642695d7cc330b9ee95da006168e4fc39bb29cba38608f519e6cf3"
+    },
+    {
+      "semilla": 12004,
+      "salas": 7,
+      "pasos_salida": 601,
+      "ida_y_vuelta": 114,
+      "salas_al_reanudar": null,
+      "sha256": "380967818c757d89a7b7f8e7eaf6727fae3e20e287d6197b92fa8ca83746c4b5"
+    },
+    {
+      "semilla": 12005,
+      "salas": 5,
+      "pasos_salida": 389,
+      "ida_y_vuelta": 114,
+      "salas_al_reanudar": null,
+      "sha256": "3b00f4ac6db197e52d1dc43b89e8cdfe3145b336413e8df19ee18bdb1236003e"
+    },
+    {
+      "semilla": 12006,
+      "salas": 5,
+      "pasos_salida": 385,
+      "ida_y_vuelta": 114,
+      "salas_al_reanudar": null,
+      "sha256": "6c2a934ec7e296f1a5f9ff9f69cc63916232ba3ad1e5dc5a38b8e55f12d3095e"
+    },
+    {
+      "semilla": 12007,
+      "salas": 7,
+      "pasos_salida": 668,
+      "ida_y_vuelta": 114,
+      "salas_al_reanudar": null,
+      "sha256": "265dacd58f7f5ac66fc969ce90fc7e2a7d09daec1df144de1c436e82969ad4e2"
+    },
+    {
+      "semilla": 12008,
+      "salas": 5,
+      "pasos_salida": 377,
+      "ida_y_vuelta": 114,
+      "salas_al_reanudar": null,
+      "sha256": "203766ecb2e1280631c52f011450d4ea3e93f42324784e3c0124bd62300b3fc0"
+    },
+    {
+      "semilla": 12009,
+      "salas": 7,
+      "pasos_salida": 618,
+      "ida_y_vuelta": 114,
+      "salas_al_reanudar": null,
+      "sha256": "e91c583ba44a808bce8f889dd0b8f4014243a703449724f0fbf2b45aceb6cfc7"
+    },
+    {
+      "semilla": 12010,
+      "salas": 7,
+      "pasos_salida": 607,
+      "ida_y_vuelta": 114,
+      "salas_al_reanudar": null,
+      "sha256": "4ed9ca38926abd33cd2273aee8943caf7ec70af5ffb36ab5393f4b31a7ce71e2"
+    },
+    {
+      "semilla": 12011,
+      "salas": 7,
+      "pasos_salida": 595,
+      "ida_y_vuelta": 114,
+      "salas_al_reanudar": null,
+      "sha256": "bd06f167903055fd2714f0f56f33380b2fa2519c270ecf79fe3b104d350896b5"
+    },
+    {
+      "semilla": 12012,
+      "salas": 6,
+      "pasos_salida": 627,
+      "ida_y_vuelta": 114,
+      "salas_al_reanudar": null,
+      "sha256": "154ab8530ae251060060077f3829b29585bd642438013139a8dd90c30d99f91f"
+    },
+    {
+      "semilla": 12013,
+      "salas": 8,
+      "pasos_salida": 723,
+      "ida_y_vuelta": 114,
+      "salas_al_reanudar": null,
+      "sha256": "168c3f89832a62ef6638cb79beff4653c488c5673503300a84ccb931732e606c"
+    },
+    {
+      "semilla": 12014,
+      "salas": 8,
+      "pasos_salida": 739,
+      "ida_y_vuelta": 114,
+      "salas_al_reanudar": null,
+      "sha256": "949981638e25c96cf45919e420091fb777a10e7f6377da3274c8df18d54d0c86"
+    },
+    {
+      "semilla": 12015,
+      "salas": 7,
+      "pasos_salida": 628,
+      "ida_y_vuelta": 114,
+      "salas_al_reanudar": null,
+      "sha256": "c791ab189e86eb75e0cd7c3bb8401aeca3bd58cfde86ef423807fe85c9309cdb"
+    },
+    {
+      "semilla": 12016,
+      "salas": 6,
+      "pasos_salida": 501,
+      "ida_y_vuelta": 114,
+      "salas_al_reanudar": null,
+      "sha256": "d169a6840ad5ab5dc08ffef7ee2e485f23f5c63585a53d9119628a56187b739b"
+    },
+    {
+      "semilla": 12017,
+      "salas": 7,
+      "pasos_salida": 668,
+      "ida_y_vuelta": 114,
+      "salas_al_reanudar": null,
+      "sha256": "8760b7c03526cc8806d41855bd97e94c5e7bdd0092b02ca89fe97e0d37cae9f6"
+    },
+    {
+      "semilla": 12018,
+      "salas": 7,
+      "pasos_salida": 610,
+      "ida_y_vuelta": 114,
+      "salas_al_reanudar": null,
+      "sha256": "3beb62f2366761913a85b61114b60855723173b5dca5db1601ca31a597e7f44f"
+    },
+    {
+      "semilla": 12019,
+      "salas": 8,
+      "pasos_salida": 729,
+      "ida_y_vuelta": 114,
+      "salas_al_reanudar": null,
+      "sha256": "be11f622b5d429da96cf8f8a1f47cf1c911e044589edee18880b64f4dd2b0e93"
+    },
+    {
+      "semilla": 12020,
+      "salas": 6,
+      "pasos_salida": 481,
+      "ida_y_vuelta": 114,
+      "salas_al_reanudar": null,
+      "sha256": "337c69350003e2275340fd3c1c0fa1e749c024fa9e807343a4ca62570668e81b"
+    },
+    {
+      "semilla": 12021,
+      "salas": 6,
+      "pasos_salida": 432,
+      "ida_y_vuelta": 114,
+      "salas_al_reanudar": null,
+      "sha256": "ffa596c94882dd184724fe4523d9a428292955e944743d52a4eb874384f54691"
+    },
+    {
+      "semilla": 12022,
+      "salas": 7,
+      "pasos_salida": 622,
+      "ida_y_vuelta": 114,
+      "salas_al_reanudar": null,
+      "sha256": "7cbb981a529ea7ee9ab7d40eedf5ccefef95c744e9afea1e8ff1967d3013adf7"
+    },
+    {
+      "semilla": 12023,
+      "salas": 6,
+      "pasos_salida": 487,
+      "ida_y_vuelta": 114,
+      "salas_al_reanudar": null,
+      "sha256": "68bfcb1c43e526c583f22c56b24370d2447b00d20dc2948b3d92781f08aa7f38"
+    }
+  ]
+}

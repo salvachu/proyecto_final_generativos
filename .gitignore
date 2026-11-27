@@ -1,0 +1,11 @@
+__pycache__/
+*.py[cod]
+.ruff_cache/
+.pytest_cache/
+.venv/
+/datos/nivel1/
+/Aplicacion/
+/World_model_Prince_of_Persia.zip
+/Grabaciones_nivel1.tar.xz
+*.sqlite3
+*.sqlite3-*

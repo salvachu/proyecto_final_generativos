@@ -1,0 +1,1446 @@
+{
+  "valid": 120,
+  "steps": 36703,
+  "simulated_seconds": 3058.5833333333335,
+  "invalid": 0,
+  "errors": [],
+  "episodios": [
+    {
+      "semilla": 47000,
+      "conjunto": "entrenamiento",
+      "pasos": 313,
+      "salas": {
+        "1": 107,
+        "2": 207
+      },
+      "fin": "step_limit",
+      "id": "c646353341484f2cbbffd014acb56d19"
+    },
+    {
+      "semilla": 47001,
+      "conjunto": "entrenamiento",
+      "pasos": 310,
+      "salas": {
+        "1": 170,
+        "2": 129,
+        "3": 12
+      },
+      "fin": "step_limit",
+      "id": "8f5cc4dc9cce42f69557ad162b34d735"
+    },
+    {
+      "semilla": 47002,
+      "conjunto": "entrenamiento",
+      "pasos": 324,
+      "salas": {
+        "1": 79,
+        "2": 201,
+        "3": 45
+      },
+      "fin": "step_limit",
+      "id": "0517caee4ea14d828d36ab7d99588fcf"
+    },
+    {
+      "semilla": 47003,
+      "conjunto": "entrenamiento",
+      "pasos": 254,
+      "salas": {
+        "1": 79,
+        "2": 109,
+        "3": 67
+      },
+      "fin": "death",
+      "id": "b85247b1fdaa4f9198a829bf0f9641ba"
+    },
+    {
+      "semilla": 47004,
+      "conjunto": "entrenamiento",
+      "pasos": 302,
+      "salas": {
+        "1": 79,
+        "2": 124,
+        "6": 100
+      },
+      "fin": "step_limit",
+      "id": "009aca1b918f42f19911f72bd8235686"
+    },
+    {
+      "semilla": 47005,
+      "conjunto": "entrenamiento",
+      "pasos": 309,
+      "salas": {
+        "1": 79,
+        "2": 124,
+        "6": 107
+      },
+      "fin": "death",
+      "id": "03a8e315f713414eaffdd3e455fbb08e"
+    },
+    {
+      "semilla": 47006,
+      "conjunto": "entrenamiento",
+      "pasos": 302,
+      "salas": {
+        "1": 190,
+        "2": 80,
+        "3": 33
+      },
+      "fin": "death",
+      "id": "f6a35c45acb345b3b51d092a460f8287"
+    },
+    {
+      "semilla": 47007,
+      "conjunto": "entrenamiento",
+      "pasos": 360,
+      "salas": {
+        "1": 79,
+        "2": 282
+      },
+      "fin": "step_limit",
+      "id": "3ba37884cb12486db6cdfb695d3fed71"
+    },
+    {
+      "semilla": 47008,
+      "conjunto": "entrenamiento",
+      "pasos": 308,
+      "salas": {
+        "1": 79,
+        "2": 230
+      },
+      "fin": "step_limit",
+      "id": "d9145c4a3a1c4507b6397e4fab65a033"
+    },
+    {
+      "semilla": 47009,
+      "conjunto": "entrenamiento",
+      "pasos": 221,
+      "salas": {
+        "1": 80,
+        "2": 97,
+        "3": 45
+      },
+      "fin": "death",
+      "id": "8a77c20171d142a4b63d129aabaf3dc5"
+    },
+    {
+      "semilla": 47010,
+      "conjunto": "entrenamiento",
+      "pasos": 293,
+      "salas": {
+        "1": 79,
+        "2": 124,
+        "6": 91
+      },
+      "fin": "step_limit",
+      "id": "db1cdefff2454a37a9c0a23a4d8cef8a"
+    },
+    {
+      "semilla": 47011,
+      "conjunto": "entrenamiento",
+      "pasos": 321,
+      "salas": {
+        "1": 79,
+        "2": 124,
+        "6": 119
+      },
+      "fin": "step_limit",
+      "id": "6907c787ef5b490d98aa056f629bf1b7"
+    },
+    {
+      "semilla": 47012,
+      "conjunto": "entrenamiento",
+      "pasos": 351,
+      "salas": {
+        "1": 352
+      },
+      "fin": "step_limit",
+      "id": "28b756499d8743f0b9db888459c04424"
+    },
+    {
+      "semilla": 47013,
+      "conjunto": "entrenamiento",
+      "pasos": 323,
+      "salas": {
+        "1": 86,
+        "2": 190,
+        "3": 48
+      },
+      "fin": "step_limit",
+      "id": "4cd4a3eb3eb44fb18d0c8a25949bc766"
+    },
+    {
+      "semilla": 47014,
+      "conjunto": "entrenamiento",
+      "pasos": 331,
+      "salas": {
+        "1": 80,
+        "2": 252
+      },
+      "fin": "step_limit",
+      "id": "571bc6de2c624d17bb7b7cb8772e5090"
+    },
+    {
+      "semilla": 47015,
+      "conjunto": "entrenamiento",
+      "pasos": 285,
+      "salas": {
+        "1": 79,
+        "2": 143,
+        "3": 64
+      },
+      "fin": "death",
+      "id": "0439f97e9fd4493c9b09bf90e1293052"
+    },
+    {
+      "semilla": 47016,
+      "conjunto": "entrenamiento",
+      "pasos": 363,
+      "salas": {
+        "1": 79,
+        "2": 124,
+        "6": 161
+      },
+      "fin": "step_limit",
+      "id": "a594d28555f547579db3433daaa7d71b"
+    },
+    {
+      "semilla": 47017,
+      "conjunto": "entrenamiento",
+      "pasos": 290,
+      "salas": {
+        "1": 79,
+        "2": 124,
+        "6": 88
+      },
+      "fin": "step_limit",
+      "id": "5096161b0cd94d42b1c3d51f61e63472"
+    },
+    {
+      "semilla": 47018,
+      "conjunto": "validacion",
+      "pasos": 292,
+      "salas": {
+        "1": 227,
+        "2": 66
+      },
+      "fin": "step_limit",
+      "id": "1e3f39795bfd49fbadad097ab81e0d36"
+    },
+    {
+      "semilla": 47019,
+      "conjunto": "validacion",
+      "pasos": 212,
+      "salas": {
+        "1": 79,
+        "2": 87,
+        "3": 47
+      },
+      "fin": "death",
+      "id": "b626cb0a67c049af9207861e5b3936bb"
+    },
+    {
+      "semilla": 47020,
+      "conjunto": "validacion",
+      "pasos": 320,
+      "salas": {
+        "1": 79,
+        "2": 150,
+        "6": 92
+      },
+      "fin": "death",
+      "id": "28180246eb314869869a11765b0bc629"
+    },
+    {
+      "semilla": 47021,
+      "conjunto": "validacion",
+      "pasos": 311,
+      "salas": {
+        "1": 81,
+        "2": 164,
+        "3": 38,
+        "6": 29
+      },
+      "fin": "step_limit",
+      "id": "f4bab9d0811940edb6dec3307bc3dd41"
+    },
+    {
+      "semilla": 47022,
+      "conjunto": "validacion",
+      "pasos": 307,
+      "salas": {
+        "1": 79,
+        "2": 124,
+        "6": 105
+      },
+      "fin": "step_limit",
+      "id": "827aabd0fd9348bd8f1170924535e0a7"
+    },
+    {
+      "semilla": 47023,
+      "conjunto": "validacion",
+      "pasos": 328,
+      "salas": {
+        "1": 79,
+        "2": 124,
+        "6": 126
+      },
+      "fin": "step_limit",
+      "id": "afa314e762d94ea0ba015f3ec4a2b459"
+    },
+    {
+      "semilla": 47024,
+      "conjunto": "entrenamiento",
+      "pasos": 324,
+      "salas": {
+        "1": 325
+      },
+      "fin": "step_limit",
+      "id": "dff53260ecdf4605832c1500f6d1298f"
+    },
+    {
+      "semilla": 47025,
+      "conjunto": "entrenamiento",
+      "pasos": 365,
+      "salas": {
+        "1": 132,
+        "2": 234
+      },
+      "fin": "step_limit",
+      "id": "d41085dffdec4ba29cae085c4eccad0b"
+    },
+    {
+      "semilla": 47026,
+      "conjunto": "entrenamiento",
+      "pasos": 365,
+      "salas": {
+        "1": 79,
+        "2": 287
+      },
+      "fin": "step_limit",
+      "id": "58041db34045437bb5b51ac4a0715dd9"
+    },
+    {
+      "semilla": 47027,
+      "conjunto": "entrenamiento",
+      "pasos": 359,
+      "salas": {
+        "1": 79,
+        "2": 224,
+        "3": 57
+      },
+      "fin": "step_limit",
+      "id": "d5c7b8289b12471da0c50fadd40fdeda"
+    },
+    {
+      "semilla": 47028,
+      "conjunto": "entrenamiento",
+      "pasos": 343,
+      "salas": {
+        "1": 79,
+        "2": 124,
+        "6": 141
+      },
+      "fin": "step_limit",
+      "id": "527269bfe88b4052a6ea2f089e1c75d5"
+    },
+    {
+      "semilla": 47029,
+      "conjunto": "entrenamiento",
+      "pasos": 361,
+      "salas": {
+        "1": 79,
+        "2": 124,
+        "6": 159
+      },
+      "fin": "step_limit",
+      "id": "b419ea47f7ea4e1290238ae49bd0382d"
+    },
+    {
+      "semilla": 47030,
+      "conjunto": "entrenamiento",
+      "pasos": 357,
+      "salas": {
+        "1": 358
+      },
+      "fin": "step_limit",
+      "id": "44ca670c12d64b8fbe3973f08ba082af"
+    },
+    {
+      "semilla": 47031,
+      "conjunto": "entrenamiento",
+      "pasos": 342,
+      "salas": {
+        "1": 188,
+        "2": 102,
+        "3": 53
+      },
+      "fin": "death",
+      "id": "ce152a69cc5d4b1597b0c2835066727c"
+    },
+    {
+      "semilla": 47032,
+      "conjunto": "entrenamiento",
+      "pasos": 360,
+      "salas": {
+        "1": 79,
+        "2": 246,
+        "6": 36
+      },
+      "fin": "step_limit",
+      "id": "f1da4d19e46046f098fdde2fee69b711"
+    },
+    {
+      "semilla": 47033,
+      "conjunto": "entrenamiento",
+      "pasos": 258,
+      "salas": {
+        "1": 79,
+        "2": 116,
+        "3": 64
+      },
+      "fin": "death",
+      "id": "6b8b2db94ad947b29955234deab92f59"
+    },
+    {
+      "semilla": 47034,
+      "conjunto": "entrenamiento",
+      "pasos": 316,
+      "salas": {
+        "1": 79,
+        "2": 124,
+        "6": 114
+      },
+      "fin": "step_limit",
+      "id": "dd11cefe2a9348969a050c88c31e31b3"
+    },
+    {
+      "semilla": 47035,
+      "conjunto": "entrenamiento",
+      "pasos": 333,
+      "salas": {
+        "1": 82,
+        "2": 124,
+        "6": 128
+      },
+      "fin": "step_limit",
+      "id": "ec631dce6f6440528ae0b056faa37504"
+    },
+    {
+      "semilla": 47036,
+      "conjunto": "prueba",
+      "pasos": 296,
+      "salas": {
+        "1": 297
+      },
+      "fin": "step_limit",
+      "id": "73b5162b6e94416da6beb62313461479"
+    },
+    {
+      "semilla": 47037,
+      "conjunto": "prueba",
+      "pasos": 187,
+      "salas": {
+        "1": 79,
+        "2": 83,
+        "3": 26
+      },
+      "fin": "death",
+      "id": "6cb139acad9c406b955af6089e7cd854"
+    },
+    {
+      "semilla": 47038,
+      "conjunto": "prueba",
+      "pasos": 182,
+      "salas": {
+        "1": 79,
+        "2": 57,
+        "3": 47
+      },
+      "fin": "death",
+      "id": "61e4dbcd794b45abb78acb6ade7f65ca"
+    },
+    {
+      "semilla": 47039,
+      "conjunto": "prueba",
+      "pasos": 220,
+      "salas": {
+        "1": 79,
+        "2": 97,
+        "3": 45
+      },
+      "fin": "death",
+      "id": "d3facc839efe48cba5618cd349f87760"
+    },
+    {
+      "semilla": 47040,
+      "conjunto": "prueba",
+      "pasos": 305,
+      "salas": {
+        "1": 79,
+        "2": 124,
+        "6": 103
+      },
+      "fin": "step_limit",
+      "id": "ef62d4839f7b4394a4f7b3aec63558fd"
+    },
+    {
+      "semilla": 47041,
+      "conjunto": "prueba",
+      "pasos": 299,
+      "salas": {
+        "1": 79,
+        "2": 124,
+        "6": 97
+      },
+      "fin": "step_limit",
+      "id": "327b0b5bc1eb43349b70da8ec5626713"
+    },
+    {
+      "semilla": 47042,
+      "conjunto": "entrenamiento",
+      "pasos": 322,
+      "salas": {
+        "1": 254,
+        "2": 69
+      },
+      "fin": "step_limit",
+      "id": "98ea890ab286452d84a314cede5a048b"
+    },
+    {
+      "semilla": 47043,
+      "conjunto": "entrenamiento",
+      "pasos": 315,
+      "salas": {
+        "1": 146,
+        "2": 118,
+        "3": 52
+      },
+      "fin": "death",
+      "id": "92a6f36f96884b1abc1f262827242d46"
+    },
+    {
+      "semilla": 47044,
+      "conjunto": "entrenamiento",
+      "pasos": 220,
+      "salas": {
+        "1": 79,
+        "2": 114,
+        "3": 28
+      },
+      "fin": "death",
+      "id": "09485288e61b4fdbbac0dff6ffd74ce7"
+    },
+    {
+      "semilla": 47045,
+      "conjunto": "entrenamiento",
+      "pasos": 251,
+      "salas": {
+        "1": 79,
+        "2": 97,
+        "3": 76
+      },
+      "fin": "death",
+      "id": "3083afc5030043d9a32a7f41d5da1cac"
+    },
+    {
+      "semilla": 47046,
+      "conjunto": "entrenamiento",
+      "pasos": 314,
+      "salas": {
+        "1": 79,
+        "2": 124,
+        "6": 112
+      },
+      "fin": "step_limit",
+      "id": "905ae1c33ab24af3ab11cc2589e18378"
+    },
+    {
+      "semilla": 47047,
+      "conjunto": "entrenamiento",
+      "pasos": 305,
+      "salas": {
+        "1": 79,
+        "2": 124,
+        "6": 103
+      },
+      "fin": "step_limit",
+      "id": "d4c7367d339043139218bfca4571caa8"
+    },
+    {
+      "semilla": 47048,
+      "conjunto": "entrenamiento",
+      "pasos": 343,
+      "salas": {
+        "1": 344
+      },
+      "fin": "step_limit",
+      "id": "186fb3a7c1a54d2fb93c6bc2f189f4c4"
+    },
+    {
+      "semilla": 47049,
+      "conjunto": "entrenamiento",
+      "pasos": 305,
+      "salas": {
+        "1": 80,
+        "2": 226
+      },
+      "fin": "step_limit",
+      "id": "c86c872751264d1d8c8a348d68990275"
+    },
+    {
+      "semilla": 47050,
+      "conjunto": "entrenamiento",
+      "pasos": 169,
+      "salas": {
+        "1": 79,
+        "2": 70,
+        "3": 21
+      },
+      "fin": "death",
+      "id": "fe664c20582e4047a5af27a092cb9a48"
+    },
+    {
+      "semilla": 47051,
+      "conjunto": "entrenamiento",
+      "pasos": 224,
+      "salas": {
+        "1": 79,
+        "2": 97,
+        "3": 49
+      },
+      "fin": "death",
+      "id": "c3542310b5be4b9dabaa0516807fbe1e"
+    },
+    {
+      "semilla": 47052,
+      "conjunto": "entrenamiento",
+      "pasos": 333,
+      "salas": {
+        "1": 81,
+        "2": 124,
+        "6": 129
+      },
+      "fin": "step_limit",
+      "id": "7caf6352e72a497ead79621be718aa7e"
+    },
+    {
+      "semilla": 47053,
+      "conjunto": "entrenamiento",
+      "pasos": 349,
+      "salas": {
+        "1": 79,
+        "2": 124,
+        "6": 147
+      },
+      "fin": "step_limit",
+      "id": "34437288446f4159aed4a1f80c5a7dcd"
+    },
+    {
+      "semilla": 47054,
+      "conjunto": "entrenamiento",
+      "pasos": 347,
+      "salas": {
+        "1": 348
+      },
+      "fin": "step_limit",
+      "id": "d0f2d3bac84f4a0b9904d2fb4cd05406"
+    },
+    {
+      "semilla": 47055,
+      "conjunto": "entrenamiento",
+      "pasos": 199,
+      "salas": {
+        "1": 79,
+        "2": 69,
+        "3": 52
+      },
+      "fin": "death",
+      "id": "b7a8070fc03045129ec30b58d956cf37"
+    },
+    {
+      "semilla": 47056,
+      "conjunto": "entrenamiento",
+      "pasos": 303,
+      "salas": {
+        "1": 79,
+        "2": 225
+      },
+      "fin": "step_limit",
+      "id": "9b704b4856644f3487a832814ca7f6b0"
+    },
+    {
+      "semilla": 47057,
+      "conjunto": "entrenamiento",
+      "pasos": 297,
+      "salas": {
+        "1": 79,
+        "2": 178,
+        "3": 41
+      },
+      "fin": "step_limit",
+      "id": "09798be1f2634b468805a718989c032c"
+    },
+    {
+      "semilla": 47058,
+      "conjunto": "entrenamiento",
+      "pasos": 305,
+      "salas": {
+        "1": 79,
+        "2": 124,
+        "6": 103
+      },
+      "fin": "death",
+      "id": "ad429d9aef3e4ef1bffb22a9ce27892c"
+    },
+    {
+      "semilla": 47059,
+      "conjunto": "entrenamiento",
+      "pasos": 357,
+      "salas": {
+        "1": 82,
+        "2": 124,
+        "6": 152
+      },
+      "fin": "death",
+      "id": "55e009104d70452a913a635f0c6e4f37"
+    },
+    {
+      "semilla": 47060,
+      "conjunto": "prueba",
+      "pasos": 360,
+      "salas": {
+        "1": 285,
+        "2": 76
+      },
+      "fin": "step_limit",
+      "id": "0a0c7ac94eca4beba885674d2f3faf2f"
+    },
+    {
+      "semilla": 47061,
+      "conjunto": "prueba",
+      "pasos": 339,
+      "salas": {
+        "1": 148,
+        "2": 141,
+        "3": 51
+      },
+      "fin": "step_limit",
+      "id": "f59ba7c80d1b4c3d8a7d1670b5261547"
+    },
+    {
+      "semilla": 47062,
+      "conjunto": "prueba",
+      "pasos": 220,
+      "salas": {
+        "1": 79,
+        "2": 84,
+        "3": 58
+      },
+      "fin": "death",
+      "id": "869b7ab1ec684b1e88fa467cdd668636"
+    },
+    {
+      "semilla": 47063,
+      "conjunto": "prueba",
+      "pasos": 284,
+      "salas": {
+        "1": 82,
+        "2": 135,
+        "3": 68
+      },
+      "fin": "death",
+      "id": "7bf7330b053d48a1ba27d4c2126b1666"
+    },
+    {
+      "semilla": 47064,
+      "conjunto": "prueba",
+      "pasos": 350,
+      "salas": {
+        "1": 79,
+        "2": 124,
+        "6": 148
+      },
+      "fin": "step_limit",
+      "id": "00b1697a91d847bba35410feefa38274"
+    },
+    {
+      "semilla": 47065,
+      "conjunto": "prueba",
+      "pasos": 319,
+      "salas": {
+        "1": 79,
+        "2": 124,
+        "6": 117
+      },
+      "fin": "step_limit",
+      "id": "8d4df2a8067c4825a1b984306bcc23e8"
+    },
+    {
+      "semilla": 47066,
+      "conjunto": "entrenamiento",
+      "pasos": 317,
+      "salas": {
+        "1": 116,
+        "2": 202
+      },
+      "fin": "step_limit",
+      "id": "9e2ff21170c54694bc13cd07b27ab734"
+    },
+    {
+      "semilla": 47067,
+      "conjunto": "entrenamiento",
+      "pasos": 358,
+      "salas": {
+        "1": 130,
+        "2": 229
+      },
+      "fin": "step_limit",
+      "id": "c18fde89b1a1449782af9807e14806e3"
+    },
+    {
+      "semilla": 47068,
+      "conjunto": "entrenamiento",
+      "pasos": 314,
+      "salas": {
+        "1": 79,
+        "2": 194,
+        "3": 42
+      },
+      "fin": "step_limit",
+      "id": "cf9f81dece324d07ae1d3b49babc1948"
+    },
+    {
+      "semilla": 47069,
+      "conjunto": "entrenamiento",
+      "pasos": 278,
+      "salas": {
+        "1": 79,
+        "2": 140,
+        "3": 60
+      },
+      "fin": "death",
+      "id": "970573081e3946a1922281ec85bdc26b"
+    },
+    {
+      "semilla": 47070,
+      "conjunto": "entrenamiento",
+      "pasos": 290,
+      "salas": {
+        "1": 79,
+        "2": 124,
+        "6": 88
+      },
+      "fin": "step_limit",
+      "id": "e64c21f9386c41198e35ef3c881e9671"
+    },
+    {
+      "semilla": 47071,
+      "conjunto": "entrenamiento",
+      "pasos": 294,
+      "salas": {
+        "1": 79,
+        "2": 124,
+        "6": 92
+      },
+      "fin": "death",
+      "id": "560910c5134e4e30a3429d6bbd9abb82"
+    },
+    {
+      "semilla": 47072,
+      "conjunto": "validacion",
+      "pasos": 360,
+      "salas": {
+        "1": 361
+      },
+      "fin": "step_limit",
+      "id": "b171efdbdb1c481082d2f252cc853b1e"
+    },
+    {
+      "semilla": 47073,
+      "conjunto": "validacion",
+      "pasos": 173,
+      "salas": {
+        "1": 79,
+        "2": 57,
+        "3": 38
+      },
+      "fin": "death",
+      "id": "aeb43b6e40a84e7d9bb3856dbc4168a0"
+    },
+    {
+      "semilla": 47074,
+      "conjunto": "validacion",
+      "pasos": 355,
+      "salas": {
+        "1": 81,
+        "2": 275
+      },
+      "fin": "step_limit",
+      "id": "c8ad941b399549109040df1e25dbfa53"
+    },
+    {
+      "semilla": 47075,
+      "conjunto": "validacion",
+      "pasos": 227,
+      "salas": {
+        "1": 79,
+        "2": 101,
+        "3": 48
+      },
+      "fin": "death",
+      "id": "c35a99259d4a42e7a370d6c339afd8f9"
+    },
+    {
+      "semilla": 47076,
+      "conjunto": "validacion",
+      "pasos": 347,
+      "salas": {
+        "1": 79,
+        "2": 124,
+        "6": 145
+      },
+      "fin": "step_limit",
+      "id": "5c9199b8a75a45f5973985ab84217ec9"
+    },
+    {
+      "semilla": 47077,
+      "conjunto": "validacion",
+      "pasos": 291,
+      "salas": {
+        "1": 79,
+        "2": 124,
+        "6": 89
+      },
+      "fin": "death",
+      "id": "e9430573eb41415b9d8ad8aa2a6efcd6"
+    },
+    {
+      "semilla": 47078,
+      "conjunto": "entrenamiento",
+      "pasos": 363,
+      "salas": {
+        "1": 182,
+        "2": 182
+      },
+      "fin": "step_limit",
+      "id": "00cb5e49af6047f4a7da64ad727f397a"
+    },
+    {
+      "semilla": 47079,
+      "conjunto": "entrenamiento",
+      "pasos": 358,
+      "salas": {
+        "1": 359
+      },
+      "fin": "step_limit",
+      "id": "2fa3a74dc3934961855f09db5a6906cc"
+    },
+    {
+      "semilla": 47080,
+      "conjunto": "entrenamiento",
+      "pasos": 361,
+      "salas": {
+        "1": 79,
+        "2": 283
+      },
+      "fin": "step_limit",
+      "id": "a849718d61cc457187f3410525641e17"
+    },
+    {
+      "semilla": 47081,
+      "conjunto": "entrenamiento",
+      "pasos": 273,
+      "salas": {
+        "1": 79,
+        "2": 135,
+        "3": 60
+      },
+      "fin": "death",
+      "id": "60da6de73c354756bf0cecd930a52393"
+    },
+    {
+      "semilla": 47082,
+      "conjunto": "entrenamiento",
+      "pasos": 327,
+      "salas": {
+        "1": 79,
+        "2": 124,
+        "6": 125
+      },
+      "fin": "step_limit",
+      "id": "bd47ada7ce3b4cd0a2456c9db960f751"
+    },
+    {
+      "semilla": 47083,
+      "conjunto": "entrenamiento",
+      "pasos": 294,
+      "salas": {
+        "1": 79,
+        "2": 124,
+        "6": 92
+      },
+      "fin": "step_limit",
+      "id": "1d14966a59c4418ca9a91da00e3d3855"
+    },
+    {
+      "semilla": 47084,
+      "conjunto": "entrenamiento",
+      "pasos": 355,
+      "salas": {
+        "1": 356
+      },
+      "fin": "step_limit",
+      "id": "bc733ab5871c4f8185fcae92dd0aad06"
+    },
+    {
+      "semilla": 47085,
+      "conjunto": "entrenamiento",
+      "pasos": 306,
+      "salas": {
+        "1": 79,
+        "2": 218,
+        "3": 10
+      },
+      "fin": "step_limit",
+      "id": "5ce635cf01a4448bb35018902c3ebd32"
+    },
+    {
+      "semilla": 47086,
+      "conjunto": "entrenamiento",
+      "pasos": 200,
+      "salas": {
+        "1": 79,
+        "2": 78,
+        "3": 44
+      },
+      "fin": "death",
+      "id": "0437d60a007844dbb583f8bc85bfb573"
+    },
+    {
+      "semilla": 47087,
+      "conjunto": "entrenamiento",
+      "pasos": 255,
+      "salas": {
+        "1": 79,
+        "2": 120,
+        "3": 57
+      },
+      "fin": "death",
+      "id": "e98017f5e3ab4d7aaf3273faa24fcc8d"
+    },
+    {
+      "semilla": 47088,
+      "conjunto": "entrenamiento",
+      "pasos": 320,
+      "salas": {
+        "1": 79,
+        "2": 124,
+        "6": 118
+      },
+      "fin": "step_limit",
+      "id": "deac3d2bca544258809b59d194158af8"
+    },
+    {
+      "semilla": 47089,
+      "conjunto": "entrenamiento",
+      "pasos": 310,
+      "salas": {
+        "1": 79,
+        "2": 124,
+        "6": 108
+      },
+      "fin": "step_limit",
+      "id": "28084edf3c7442e1a75a182db1fccf14"
+    },
+    {
+      "semilla": 47090,
+      "conjunto": "prueba",
+      "pasos": 320,
+      "salas": {
+        "1": 79,
+        "2": 59,
+        "3": 45,
+        "9": 138
+      },
+      "fin": "level_complete",
+      "id": "d571b719be3d46ad96f09f289ef9249b"
+    },
+    {
+      "semilla": 47091,
+      "conjunto": "validacion",
+      "pasos": 306,
+      "salas": {
+        "1": 79,
+        "2": 59,
+        "3": 45,
+        "9": 124
+      },
+      "fin": "level_complete",
+      "id": "df20838d81b54c61861fc8696ffed5c6"
+    },
+    {
+      "semilla": 47092,
+      "conjunto": "entrenamiento",
+      "pasos": 308,
+      "salas": {
+        "1": 79,
+        "2": 59,
+        "3": 45,
+        "9": 126
+      },
+      "fin": "level_complete",
+      "id": "42c3f35533724eaba999804864dee12e"
+    },
+    {
+      "semilla": 47093,
+      "conjunto": "entrenamiento",
+      "pasos": 313,
+      "salas": {
+        "1": 79,
+        "2": 59,
+        "3": 45,
+        "9": 131
+      },
+      "fin": "level_complete",
+      "id": "97f4b842f4084e64be62eb0faa4959c2"
+    },
+    {
+      "semilla": 47094,
+      "conjunto": "entrenamiento",
+      "pasos": 305,
+      "salas": {
+        "1": 79,
+        "2": 59,
+        "3": 45,
+        "9": 123
+      },
+      "fin": "level_complete",
+      "id": "5ef4eeb677c44793be5fcb41967074db"
+    },
+    {
+      "semilla": 47095,
+      "conjunto": "entrenamiento",
+      "pasos": 316,
+      "salas": {
+        "1": 79,
+        "2": 59,
+        "3": 45,
+        "9": 134
+      },
+      "fin": "level_complete",
+      "id": "6783d125d28249599058a1a4ab052f3f"
+    },
+    {
+      "semilla": 47096,
+      "conjunto": "prueba",
+      "pasos": 311,
+      "salas": {
+        "1": 79,
+        "2": 59,
+        "3": 45,
+        "9": 129
+      },
+      "fin": "level_complete",
+      "id": "799ec23393f847aea621ed2a8ebef52e"
+    },
+    {
+      "semilla": 47097,
+      "conjunto": "validacion",
+      "pasos": 310,
+      "salas": {
+        "1": 79,
+        "2": 59,
+        "3": 45,
+        "9": 128
+      },
+      "fin": "level_complete",
+      "id": "5673b328cbfe428691a288c22452ace0"
+    },
+    {
+      "semilla": 47098,
+      "conjunto": "entrenamiento",
+      "pasos": 307,
+      "salas": {
+        "1": 79,
+        "2": 59,
+        "3": 45,
+        "9": 125
+      },
+      "fin": "level_complete",
+      "id": "b2ce148b3c614f449c9682a5b0ac7691"
+    },
+    {
+      "semilla": 47099,
+      "conjunto": "entrenamiento",
+      "pasos": 310,
+      "salas": {
+        "1": 79,
+        "2": 59,
+        "3": 45,
+        "9": 128
+      },
+      "fin": "level_complete",
+      "id": "72812406f7e14ad982029deba9d07560"
+    },
+    {
+      "semilla": 47100,
+      "conjunto": "entrenamiento",
+      "pasos": 306,
+      "salas": {
+        "1": 79,
+        "2": 59,
+        "3": 45,
+        "9": 124
+      },
+      "fin": "level_complete",
+      "id": "86407e20c5ea48a1b0c008e5cd7af69b"
+    },
+    {
+      "semilla": 47101,
+      "conjunto": "entrenamiento",
+      "pasos": 304,
+      "salas": {
+        "1": 79,
+        "2": 59,
+        "3": 45,
+        "9": 122
+      },
+      "fin": "level_complete",
+      "id": "d8a520361a2047828161703043dac593"
+    },
+    {
+      "semilla": 47102,
+      "conjunto": "prueba",
+      "pasos": 320,
+      "salas": {
+        "1": 80,
+        "2": 59,
+        "3": 45,
+        "9": 137
+      },
+      "fin": "level_complete",
+      "id": "033d7da93cf2411eb8eba95d1a9d066a"
+    },
+    {
+      "semilla": 47103,
+      "conjunto": "validacion",
+      "pasos": 319,
+      "salas": {
+        "1": 79,
+        "2": 59,
+        "3": 45,
+        "9": 137
+      },
+      "fin": "level_complete",
+      "id": "70fe77c069c646a38bf08f84751a446e"
+    },
+    {
+      "semilla": 47104,
+      "conjunto": "entrenamiento",
+      "pasos": 309,
+      "salas": {
+        "1": 79,
+        "2": 59,
+        "3": 45,
+        "9": 127
+      },
+      "fin": "level_complete",
+      "id": "d7dc710beba443f8983905cbfae38b07"
+    },
+    {
+      "semilla": 47105,
+      "conjunto": "entrenamiento",
+      "pasos": 320,
+      "salas": {
+        "1": 79,
+        "2": 59,
+        "3": 45,
+        "9": 138
+      },
+      "fin": "level_complete",
+      "id": "85a2ba50a26841d4bdef34846e46b59c"
+    },
+    {
+      "semilla": 47106,
+      "conjunto": "entrenamiento",
+      "pasos": 303,
+      "salas": {
+        "1": 79,
+        "2": 59,
+        "3": 45,
+        "9": 121
+      },
+      "fin": "level_complete",
+      "id": "6f88d6414bc640e983c82090932e3d50"
+    },
+    {
+      "semilla": 47107,
+      "conjunto": "entrenamiento",
+      "pasos": 307,
+      "salas": {
+        "1": 79,
+        "2": 59,
+        "3": 45,
+        "9": 125
+      },
+      "fin": "level_complete",
+      "id": "95d4b4c06cdc41edb3ff0261c8d3576e"
+    },
+    {
+      "semilla": 47108,
+      "conjunto": "prueba",
+      "pasos": 320,
+      "salas": {
+        "1": 79,
+        "2": 59,
+        "3": 45,
+        "9": 138
+      },
+      "fin": "level_complete",
+      "id": "a8926f89fc254051a9afcbb36371a730"
+    },
+    {
+      "semilla": 47109,
+      "conjunto": "validacion",
+      "pasos": 320,
+      "salas": {
+        "1": 80,
+        "2": 59,
+        "3": 45,
+        "9": 137
+      },
+      "fin": "level_complete",
+      "id": "edbe532230924c13ab9ee15cd8980b0d"
+    },
+    {
+      "semilla": 47110,
+      "conjunto": "entrenamiento",
+      "pasos": 317,
+      "salas": {
+        "1": 79,
+        "2": 59,
+        "3": 45,
+        "9": 135
+      },
+      "fin": "level_complete",
+      "id": "5a2bbad052494b4a8ffc22c2be6cb58f"
+    },
+    {
+      "semilla": 47111,
+      "conjunto": "entrenamiento",
+      "pasos": 313,
+      "salas": {
+        "1": 79,
+        "2": 59,
+        "3": 45,
+        "9": 131
+      },
+      "fin": "level_complete",
+      "id": "4c2392f845084dbc8cfc516bba2f2b83"
+    },
+    {
+      "semilla": 47112,
+      "conjunto": "entrenamiento",
+      "pasos": 317,
+      "salas": {
+        "1": 81,
+        "2": 59,
+        "3": 45,
+        "9": 133
+      },
+      "fin": "level_complete",
+      "id": "0f099557303c4dcaab7cca511f322ff8"
+    },
+    {
+      "semilla": 47113,
+      "conjunto": "entrenamiento",
+      "pasos": 316,
+      "salas": {
+        "1": 79,
+        "2": 59,
+        "3": 45,
+        "9": 134
+      },
+      "fin": "level_complete",
+      "id": "c48e158645a24ccaafe7c5d2e51435bc"
+    },
+    {
+      "semilla": 47114,
+      "conjunto": "prueba",
+      "pasos": 308,
+      "salas": {
+        "1": 79,
+        "2": 59,
+        "3": 45,
+        "9": 126
+      },
+      "fin": "level_complete",
+      "id": "df3228f466cd415aaa7f701b81edb6e7"
+    },
+    {
+      "semilla": 47115,
+      "conjunto": "validacion",
+      "pasos": 308,
+      "salas": {
+        "1": 79,
+        "2": 59,
+        "3": 45,
+        "9": 126
+      },
+      "fin": "level_complete",
+      "id": "7b9cde8733b4454984b33686a51adb44"
+    },
+    {
+      "semilla": 47116,
+      "conjunto": "entrenamiento",
+      "pasos": 317,
+      "salas": {
+        "1": 79,
+        "2": 59,
+        "3": 45,
+        "9": 135
+      },
+      "fin": "level_complete",
+      "id": "6fc17bd890964f7890fa0a5bd41cc8da"
+    },
+    {
+      "semilla": 47117,
+      "conjunto": "entrenamiento",
+      "pasos": 304,
+      "salas": {
+        "1": 79,
+        "2": 59,
+        "3": 45,
+        "9": 122
+      },
+      "fin": "level_complete",
+      "id": "bb5ee9b41ff64753954c96e7eaff486a"
+    },
+    {
+      "semilla": 47118,
+      "conjunto": "entrenamiento",
+      "pasos": 306,
+      "salas": {
+        "1": 79,
+        "2": 59,
+        "3": 45,
+        "9": 124
+      },
+      "fin": "level_complete",
+      "id": "4d7d6e6fb0924d6687ba1fa867ee762b"
+    },
+    {
+      "semilla": 47119,
+      "conjunto": "entrenamiento",
+      "pasos": 305,
+      "salas": {
+        "1": 79,
+        "2": 59,
+        "3": 45,
+        "9": 123
+      },
+      "fin": "level_complete",
+      "id": "8b5485a273ca4aa2b9234b06e0c2c1b7"
+    }
+  ]
+}

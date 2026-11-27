@@ -1,0 +1,20 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "sdlpop-recorder"
+version = "0.1.0"
+description = "Action-aligned Prince of Persia episodes for world models"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = ["numpy>=1.24", "h5py>=3.9"]
+
+[project.optional-dependencies]
+play = ["pygame-ce>=2.5"]
+
+[project.scripts]
+sdlpop-recorder = "sdlpop_recorder.cli:main"
+
+[tool.setuptools.package-data]
+sdlpop_recorder = ["native/*.patch"]

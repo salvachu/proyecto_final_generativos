@@ -1,0 +1,250 @@
+diff --git a/src/CMakeLists.txt b/src/CMakeLists.txt
+index ee8da73..30eb48f 100644
+--- a/src/CMakeLists.txt
++++ b/src/CMakeLists.txt
+@@ -55,6 +55,7 @@ endif()
+ 
+ set(SOURCE_FILES
+         main.c
++        recorder.c
+         common.h
+         config.h
+         data.c
+diff --git a/src/Makefile b/src/Makefile
+index 03301d3..4aeb9e9 100644
+--- a/src/Makefile
++++ b/src/Makefile
+@@ -4,7 +4,7 @@ CC = gcc
+ RM = rm -f
+ 
+ HFILES = common.h config.h data.h proto.h types.h
+-OBJ = main.o data.o seg000.o seg001.o seg002.o seg003.o seg004.o seg005.o seg006.o seg007.o seg008.o seg009.o seqtbl.o replay.o options.o lighting.o screenshot.o menu.o midi.o opl3.o stb_vorbis.o
++OBJ = main.o recorder.o data.o seg000.o seg001.o seg002.o seg003.o seg004.o seg005.o seg006.o seg007.o seg008.o seg009.o seqtbl.o replay.o options.o lighting.o screenshot.o menu.o midi.o opl3.o stb_vorbis.o
+ BIN = ../prince
+ 
+ OS      := $(shell uname)
+diff --git a/src/proto.h b/src/proto.h
+index 4af7d68..a81f11b 100644
+--- a/src/proto.h
++++ b/src/proto.h
+@@ -20,6 +20,12 @@ The authors of this program may be contacted at https://forum.princed.org
+ 
+ // SEG000.C
+ void pop_main(void);
++void recorder_init(void);
++int recorder_active(void);
++int recorder_period(void);
++void recorder_read_action(void);
++void recorder_apply_action(void);
++void recorder_frame(void);
+ void init_game_main(void);
+ void start_game(void);
+ int process_key(void);
+diff --git a/src/recorder.c b/src/recorder.c
+new file mode 100644
+index 0000000..ee31640
+--- /dev/null
++++ b/src/recorder.c
+@@ -0,0 +1,78 @@
++// SPDX-License-Identifier: GPL-3.0-or-later
++#include "common.h"
++#ifdef _WIN32
++#include <fcntl.h>
++#include <io.h>
++#define rec_dup _dup
++#define rec_dup2 _dup2
++#define rec_fileno _fileno
++#define rec_fdopen _fdopen
++#else
++#define rec_dup dup
++#define rec_dup2 dup2
++#define rec_fileno fileno
++#define rec_fdopen fdopen
++#endif
++
++static FILE *frames;
++static unsigned int step_number;
++static int buttons;
++static int dt_ticks;
++
++void recorder_init(void) {
++	if (!check_param("--recorder")) return;
++	int fd = rec_dup(rec_fileno(stdout));
++	if (fd < 0 || rec_dup2(rec_fileno(stderr), rec_fileno(stdout)) < 0) exit(2);
++#ifdef _WIN32
++	_setmode(fd, _O_BINARY);
++	_setmode(rec_fileno(stdin), _O_BINARY);
++#endif
++	frames = rec_fdopen(fd, "wb");
++	if (!frames) exit(2);
++}
++
++int recorder_active(void) {
++	return frames != NULL;
++}
++
++int recorder_period(void) {
++	return Kid.sword == sword_2_drawn ? custom->fight_speed : custom->base_speed;
++}
++
++void recorder_read_action(void) {
++	int mask = fgetc(stdin);
++	if (mask == EOF) exit(ferror(stdin) ? 2 : 0);
++	if (mask > 31 || (mask & 3) == 3 || (mask & 12) == 12) exit(2);
++	buttons = mask;
++	dt_ticks = recorder_period();
++	++step_number;
++}
++
++void recorder_apply_action(void) {
++	control_x = (buttons & 1) ? CONTROL_HELD_LEFT : (buttons & 2) ? CONTROL_HELD_RIGHT : CONTROL_RELEASED;
++	control_y = (buttons & 4) ? CONTROL_HELD_UP : (buttons & 8) ? CONTROL_HELD_DOWN : CONTROL_RELEASED;
++	control_shift = (buttons & 16) ? CONTROL_HELD : CONTROL_RELEASED;
++}
++
++void recorder_frame(void) {
++	// One post-render observation, including the native HUD, per simulation step.
++	static unsigned char rgb[320 * 200 * 3];
++	SDL_Surface *surface = onscreen_surface_;
++	if (!surface || surface->w != 320 || surface->h != 200 ||
++	    SDL_ConvertPixels(320, 200, surface->format->format, surface->pixels,
++	                      surface->pitch, SDL_PIXELFORMAT_RGB24, rgb, 320 * 3) < 0) {
++		fprintf(stderr, "recorder: RGB capture failed: %s\n", SDL_GetError());
++		exit(2);
++	}
++	const char *end = "playing";
++	if (current_level == custom->win_level && drawn_room == custom->win_room) end = "victory";
++	else if (next_level != current_level) end = "level_complete";
++	else if (hitp_curr == 0 || Kid.alive >= 0) end = "death";
++	else if (rem_min == 0 && current_level < 13) end = "time_expired";
++
++	if (fprintf(frames, "POP1 %u %d %d %d %s %d %d %d %d %d %d %d %d\n",
++	            step_number, buttons, dt_ticks, recorder_period(), end, current_level, Kid.room,
++	            Kid.x, Kid.y, Kid.direction, hitp_curr, Kid.frame, Kid.sword) < 0 ||
++	    fwrite(rgb, 1, sizeof(rgb), frames) != sizeof(rgb) || fflush(frames) != 0) exit(2);
++	if (strcmp(end, "playing") != 0) exit(0);
++}
+diff --git a/src/seg000.c b/src/seg000.c
+index 3701636..051fb70 100644
+--- a/src/seg000.c
++++ b/src/seg000.c
+@@ -36,6 +36,7 @@ void fix_sound_priorities(void);
+ 
+ // seg000:0000
+ void pop_main() {
++	recorder_init();
+ 	if (check_param("--version") || check_param("-v")) {
+ 		printf ("SDLPoP v%s\n", SDLPOP_VERSION);
+ 		exit(0);
+@@ -64,8 +65,9 @@ void pop_main() {
+ 	load_global_options();
+ 	check_mod_param();
+ #ifdef USE_MENU
+-	load_ingame_settings();
++	if (!recorder_active()) load_ingame_settings();
+ #endif
++	if (recorder_active()) enable_controller_rumble = 0;
+ 	if (check_param("mute")) is_sound_on = 0;
+ 	turn_sound_on_off((is_sound_on != 0) * 15); // Turn off sound/music if those options were set.
+ 
+@@ -92,6 +94,8 @@ void pop_main() {
+ 	init_copyprot_dialog();
+ 
+ 	load_mod_options();
++	// In silent capture mode feather fall uses the native simulation timer.
++	if (recorder_active()) fixes->fix_quicksave_during_feather = 1;
+ 
+ 	// CusPop option
+ 	is_blind_mode = custom->start_in_blind_mode;
+@@ -122,7 +126,7 @@ void pop_main() {
+ 	// I moved this after init_copyprot_dialog(), so open_dat() can show an error dialog if needed.
+ 	dathandle = open_dat("PRINCE.DAT", 'G');
+ 
+-	if (cheats_enabled
++	if (cheats_enabled || recorder_active()
+ 		#ifdef USE_REPLAY
+ 		|| recording
+ 		#endif
+@@ -907,7 +911,7 @@ void play_frame() {
+ 	}
+ 	show_time();
+ 	// expiring doesn't count on Jaffar/princess level
+-	if (current_level < 13 && rem_min == 0) {
++	if (current_level < 13 && rem_min == 0 && !recorder_active()) {
+ 		expired();
+ 	}
+ }
+@@ -1263,7 +1267,7 @@ void check_the_end() {
+ 			if (replaying) end_replay();
+ #endif
+ 			// Special event: end of game
+-			end_sequence();
++			if (!recorder_active()) end_sequence();
+ 		}
+ 		different_room = 1;
+ 		loadkid();
+@@ -1701,6 +1705,11 @@ void load_more_opt_graf(const char* filename) {
+ 
+ // seg000:148D
+ int do_paused() {
++	if (recorder_active()) {
++		next_room = 0;
++		recorder_apply_action();
++		return control_shift;
++	}
+ #ifdef USE_REPLAY
+ 	if (replaying && skipping_replay) return 0;
+ #endif
+diff --git a/src/seg003.c b/src/seg003.c
+index f2a80b8..528e239 100644
+--- a/src/seg003.c
++++ b/src/seg003.c
+@@ -66,7 +66,7 @@ void play_level(int level_number) {
+ 				quit(1);
+ 			}
+ 			cutscene_func = tbl_cutscenes[custom->tbl_cutscenes_by_index[level_number]];
+-			if (cutscene_func != NULL
++			if (cutscene_func != NULL && !recorder_active()
+ 
+ 				#ifdef USE_REPLAY
+ 				&& !(recording || replaying)
+@@ -345,10 +345,12 @@ void test_timings(test_timing_state_type* state) {
+ // - The next level if the level was completed.
+ int play_level_2() {
+ 	reset_timer(timer_1);
++	if (recorder_active()) recorder_frame();
+ #ifdef CHECK_TIMING
+ 	test_timing_state_type test_timing_state = {0};
+ #endif
+ 	while (1) { // main loop
++		if (recorder_active()) recorder_read_action();
+ #ifdef USE_QUICKSAVE
+ 		check_quick_op();
+ #endif
+@@ -384,11 +386,12 @@ int play_level_2() {
+ 			is_restart_level = 0;
+ 			return current_level;
+ 		} else {
+-			if (next_level == current_level || check_sound_playing()) {
++			if (recorder_active() || next_level == current_level || check_sound_playing()) {
+ 				draw_game_frame();
+ 				flash_if_hurt();
+ 				remove_flash_if_hurt();
+-				do_simple_wait(timer_1);
++				if (recorder_active()) recorder_frame();
++				else do_simple_wait(timer_1);
+ 			} else {
+ 				stop_sounds();
+ 				hitp_beg_lev = hitp_max;
+diff --git a/src/seg009.c b/src/seg009.c
+index a6c496e..5634f48 100644
+--- a/src/seg009.c
++++ b/src/seg009.c
+@@ -2430,6 +2430,7 @@ void free_sound(sound_buffer_type* buffer) {
+ 
+ // seg009:7220
+ void play_sound_from_buffer(sound_buffer_type* buffer) {
++	if (recorder_active()) return;
+ 
+ #ifdef USE_REPLAY
+ 	if (replaying && skipping_replay) return;

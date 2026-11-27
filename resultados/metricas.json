@@ -1,0 +1,53 @@
+{
+  "ventanas": 4736,
+  "episodios": 17,
+  "horizontes": {
+    "1": {
+      "modelo": {
+        "mae_rgb": 0.7843426099210172,
+        "mae_cambio": 32.551371126685545
+      },
+      "persistencia": {
+        "mae_rgb": 1.059769540941393,
+        "mae_cambio": 58.8616833690669
+      },
+      "acciones_permutadas": {
+        "mae_rgb": 0.8063994160213986,
+        "mae_cambio": 33.66480673755898
+      },
+      "fraccion_pixeles_cambiados": 0.01789310599662162
+    },
+    "4": {
+      "modelo": {
+        "mae_rgb": 2.3505829348177523,
+        "mae_cambio": 49.96933386318429
+      },
+      "persistencia": {
+        "mae_rgb": 2.576901432965253,
+        "mae_cambio": 68.93963672813612
+      },
+      "acciones_permutadas": {
+        "mae_rgb": 2.451167023117478,
+        "mae_cambio": 51.803266879258295
+      },
+      "fraccion_pixeles_cambiados": 0.037192831503378376
+    },
+    "12": {
+      "modelo": {
+        "mae_rgb": 5.989893158371384,
+        "mae_cambio": 61.41042236827917
+      },
+      "persistencia": {
+        "mae_rgb": 5.680978694812672,
+        "mae_cambio": 68.89153747342489
+      },
+      "acciones_permutadas": {
+        "mae_rgb": 6.075126079662426,
+        "mae_cambio": 62.14317767445023
+      },
+      "fraccion_pixeles_cambiados": 0.08199852195945946
+    }
+  },
+  "conjunto": "prueba",
+  "paso_checkpoint": 3300
+}

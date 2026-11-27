@@ -1,0 +1,309 @@
+"""Explorador de mazmorras generadas con memoria de las salas visitadas."""
+
+import os
+import secrets
+import sqlite3
+import sys
+import tkinter as tk
+import zlib
+from pathlib import Path
+from tkinter import messagebox, ttk
+
+from PIL import Image, ImageTk
+from niveles import MotorTemporal, Game
+from salas import GeneradorNeuronal
+from partidas import Biblioteca, Partida
+
+FONDO, PANEL, TEXTO, ORO, GRIS = "#111b24", "#1c2934", "#f5eddd", "#efbb73", "#a9bac5"
+TECLAS = {
+    "a": 1,
+    "left": 1,
+    "d": 2,
+    "right": 2,
+    "w": 4,
+    "up": 4,
+    "s": 8,
+    "down": 8,
+    "shift_l": 16,
+    "shift_r": 16,
+    "space": 0,
+}
+FIN = {
+    "level_complete": "¡Has salido de la mazmorra!",
+    "death": "El príncipe ha caído.",
+    "victory": "¡Victoria!",
+    "time_expired": "Se ha agotado el tiempo.",
+}
+
+
+def directorio_usuario():
+    if sys.platform == "win32":
+        return Path(os.environ.get("LOCALAPPDATA", Path.home())) / "PrinceOfPersiaMundos"
+    return (
+        Path(os.environ.get("XDG_DATA_HOME", Path.home() / ".local/share"))
+        / "prince-of-persia-mundos"
+    )
+
+
+class Explorador:
+    def __init__(self, root, carpeta=None):
+        self.root = root
+        self.bib = Biblioteca((carpeta or directorio_usuario()) / "mundos.sqlite3")
+        self.modelo = GeneradorNeuronal()
+        self.motor = MotorTemporal()
+        self.partida = self.timer = self.seleccion = None
+        self.teclas = set()
+        self.jugando = False
+        root.title("Prince of Persia · Mazmorras generadas")
+        root.configure(bg=FONDO)
+        main = tk.Frame(root, bg=FONDO, padx=18, pady=14)
+        main.pack()
+        self.texto(main, "Mazmorras de Persia", 23, TEXTO, True).grid(row=0, column=0, sticky="w")
+        barra = tk.Frame(main, bg=FONDO)
+        barra.grid(row=0, column=1, sticky="e")
+        self.lista = ttk.Combobox(barra, width=26, state="readonly", takefocus=False)
+        self.lista.pack(side="left", padx=(0, 6))
+        self.lista.bind("<<ComboboxSelected>>", self.elegir)
+        ttk.Button(barra, text="Nuevo nivel", command=self.nuevo, takefocus=False).pack(side="left")
+        cuerpo = tk.Frame(main, bg=FONDO)
+        cuerpo.grid(row=1, column=0, columnspan=2, pady=(12, 8))
+        self.vista = tk.Label(cuerpo, bg="black", borderwidth=0)
+        self.vista.grid(row=0, column=0, sticky="nw")
+        lateral = tk.Frame(cuerpo, bg=PANEL, padx=12, pady=9)
+        lateral.grid(row=0, column=1, sticky="nsew", padx=(12, 0))
+        self.texto(lateral, "Mapa explorado", 15, TEXTO, True).pack(anchor="w")
+        self.contador = self.texto(lateral, "", 10, ORO)
+        self.contador.pack(anchor="w")
+        self.mapa = tk.Canvas(lateral, width=238, height=84, bg=PANEL, highlightthickness=0)
+        self.mapa.pack(anchor="w", pady=(6, 1))
+        self.texto(lateral, "Pulsa una sala para recordarla.", 10, GRIS).pack(anchor="w")
+        self.titulo_recuerdo = self.texto(lateral, "", 12, TEXTO, True)
+        self.titulo_recuerdo.pack(anchor="w", pady=(14, 5))
+        self.recuerdo = tk.Label(lateral, bg=PANEL, borderwidth=0)
+        self.recuerdo.pack(anchor="w")
+        self.estado = self.texto(main, "", 12, ORO, True)
+        self.estado.grid(row=2, column=0, columnspan=2, sticky="w")
+        self.texto(
+            main,
+            "Explora hacia la derecha, pisa la placa y pulsa W ante la puerta abierta.",
+            11,
+            TEXTO,
+        ).grid(row=3, column=0, columnspan=2, sticky="w")
+        self.texto(
+            main,
+            "A / D   mover     W   saltar o trepar     S   bajar     Shift   agarrarse     P   pausa",
+            10,
+            GRIS,
+        ).grid(row=4, column=0, columnspan=2, sticky="w", pady=(2, 7))
+        controles = tk.Frame(main, bg=FONDO)
+        controles.grid(row=5, column=0, columnspan=2, sticky="w")
+        self.play = ttk.Button(controles, text="Jugar", command=self.alternar, takefocus=False)
+        self.play.pack(side="left", padx=(0, 5))
+        ttk.Button(
+            controles, text="Reintentar desde la entrada", command=self.reintentar, takefocus=False
+        ).pack(side="left")
+        root.bind("<KeyPress>", self.pulsar)
+        root.bind("<KeyRelease>", lambda e: self.teclas.discard(e.keysym.lower()))
+        root.bind("<FocusOut>", self.perder_foco)
+        root.protocol("WM_DELETE_WINDOW", self.cerrar)
+        if self.bib.activo() is None:
+            mundos = self.bib.listar()
+            if mundos:
+                self.abrir(mundos[0][0])
+            else:
+                self.nuevo()
+        else:
+            self.abrir(self.bib.activo())
+
+    @staticmethod
+    def texto(padre, s, size, color, bold=False):
+        return tk.Label(
+            padre,
+            text=s,
+            bg=padre["bg"],
+            fg=color,
+            anchor="w",
+            font=("Segoe UI", size, "bold" if bold else "normal"),
+        )
+
+    def nuevo(self):
+        self.pausar()
+        self.estado.config(text="El world model está generando la entrada…")
+        self.root.update_idletasks()
+        try:
+            seed = secrets.randbelow(2**31)
+            mapa, ruta = self.modelo.entrada_nueva(self.motor, seed)
+            with Game(self.motor.ruta, 1, seed) as g:
+                mundo = self.bib.crear(seed, mapa, ruta, g.frame, neuronal=True)
+            self.abrir(mundo)
+        except (OSError, ValueError, RuntimeError, sqlite3.Error) as e:
+            messagebox.showerror("Creación del nivel", str(e), parent=self.root)
+            self.estado.config(text="No se pudo crear el nivel.")
+
+    def elegir(self, _evento):
+        self.abrir(self.mundos[self.lista.current()][0])
+
+    def abrir(self, mundo, reiniciar=False):
+        self.pausar()
+        # La partida anterior sigue disponible si la nueva no se puede restaurar.
+        nueva = Partida(self.bib, self.motor, mundo, reiniciar, self.modelo)
+        if self.partida:
+            self.partida.game.close()
+        self.partida = nueva
+        self.mundos = self.bib.listar()
+        self.lista.configure(values=[f"Mundo {i}  ·  {s}" for i, s in self.mundos])
+        self.lista.current(next(j for j, (i, _) in enumerate(self.mundos) if i == mundo))
+        self.seleccion = None
+        self.mostrar()
+        self.root.focus_set()
+
+    def reintentar(self):
+        if self.partida:
+            self.pausar()
+            if self.partida.game.frame.index and not messagebox.askyesno(
+                "Volver a la entrada",
+                "¿Reiniciar este intento? El mapa explorado seguirá guardado.",
+                parent=self.root,
+            ):
+                return
+            self.abrir(self.partida.id, True)
+
+    def perder_foco(self, e):
+        if e.widget == self.root:
+            self.pausar()
+
+    def pausar(self):
+        self.jugando = False
+        self.teclas.clear()
+        if self.timer is not None:
+            self.root.after_cancel(self.timer)
+            self.timer = None
+        if self.partida:
+            self.play.configure(text="Jugar")
+            self.rotulo()
+
+    def alternar(self):
+        if self.jugando:
+            self.pausar()
+        else:
+            self.iniciar()
+
+    def iniciar(self):
+        if (
+            self.partida
+            and self.partida.game.process
+            and self.partida.game.frame.end == "playing"
+            and not self.jugando
+        ):
+            self.jugando = True
+            self.play.configure(text="Pausar")
+            self.root.focus_set()
+            self.tick()
+
+    def pulsar(self, e):
+        k = e.keysym.lower()
+        if k == "p":
+            self.alternar()
+            return "break"
+        if k in TECLAS:
+            self.teclas.add(k)
+            self.iniciar()
+            return "break"
+
+    def tick(self):
+        self.timer = None
+        if not self.jugando:
+            return
+        mask = 0
+        for k in self.teclas:
+            mask |= TECLAS[k]
+        if mask & 1:
+            mask &= ~2
+        if mask & 4:
+            mask &= ~8
+        try:
+            frame = self.partida.paso(mask)
+        except (OSError, RuntimeError, ValueError, sqlite3.Error) as e:
+            self.pausar()
+            messagebox.showerror("Partida detenida", str(e), parent=self.root)
+            return
+        if frame.end != "playing":
+            self.pausar()
+        self.mostrar()
+        if self.jugando:
+            self.timer = self.root.after(round(1000 * frame.next_ticks / 60), self.tick)
+
+    def rotulo(self):
+        f = self.partida.game.frame
+        estado = FIN.get(f.end) or ("Jugando" if self.jugando else "En pausa")
+        self.estado.configure(
+            text=f"{estado}    ·    Sala {f.state[1]}    ·    Paso {f.index} guardado"
+        )
+
+    def mostrar(self):
+        p = self.partida
+        frame = p.game.frame
+        foto = Image.fromarray(frame.rgb).resize((512, 320), Image.Resampling.NEAREST)
+        self.vista.image = ImageTk.PhotoImage(foto)
+        self.vista.configure(image=self.vista.image)
+        n = p.mapa[2048]
+        etiqueta = "generadas por la red" if p.red is not None else "descubiertas · mapa anterior"
+        self.contador.config(text=f"{len(p.vistas)} de {n} salas {etiqueta}")
+        self.mapa.delete("all")
+        for sala in p.vistas:
+            col = p.mapa[2049 + sala - 1] - 1
+            fila = p.mapa[2073 + sala - 1] - 1
+            x, y = 3 + 33 * col, 5 + 36 * fila
+            links = p.mapa[1952 + 4 * (sala - 1) : 1956 + 4 * (sala - 1)]
+            if links[1] in p.vistas:
+                self.mapa.create_line(x + 26, y + 13, x + 34, y + 13, fill=GRIS)
+            if links[3] in p.vistas:
+                self.mapa.create_line(x + 13, y + 24, x + 13, y + 37, fill=GRIS)
+            actual = sala == frame.state[1]
+            tag = f"s{sala}"
+            self.mapa.create_rectangle(
+                x,
+                y,
+                x + 26,
+                y + 25,
+                fill=ORO if actual else "#334857",
+                outline=ORO if sala == self.seleccion else GRIS,
+                tags=tag,
+            )
+            self.mapa.create_text(
+                x + 13, y + 12, text=str(sala), fill=FONDO if actual else TEXTO, tags=tag
+            )
+            self.mapa.tag_bind(tag, "<Button-1>", lambda e, s=sala: self.ver_sala(s))
+        self.mostrar_recuerdo()
+        self.rotulo()
+
+    def ver_sala(self, sala):
+        self.seleccion = sala
+        self.mostrar()
+
+    def mostrar_recuerdo(self):
+        sala = self.seleccion or self.partida.game.frame.state[1]
+        rgb = zlib.decompress(self.partida.vistas[sala])
+        mini = Image.frombytes("RGB", (96, 60), rgb).resize((192, 120), Image.Resampling.NEAREST)
+        self.recuerdo.image = ImageTk.PhotoImage(mini)
+        self.recuerdo.configure(image=self.recuerdo.image)
+        self.titulo_recuerdo.config(text=f"Última visita  ·  Sala {sala}")
+
+    def cerrar(self):
+        self.pausar()
+        if self.partida:
+            self.partida.game.close()
+        self.motor.cerrar()
+        self.bib.db.close()
+        self.root.destroy()
+
+
+if __name__ == "__main__":
+    root = tk.Tk()
+    try:
+        app = Explorador(root)
+    except (OSError, RuntimeError, ValueError, sqlite3.Error) as e:
+        messagebox.showerror("No se pudo abrir el explorador", str(e), parent=root)
+        root.destroy()
+        raise SystemExit(1)
+    root.mainloop()

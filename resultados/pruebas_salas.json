@@ -1,0 +1,66 @@
+[
+  {
+    "semilla": 82000,
+    "pasos": 475,
+    "salas_generadas": 5,
+    "entrada": "03b9eede6e55948484e78f6b6efd48a28c4b3334373756d9e28ce2d61848b0a5",
+    "mapa": "e9450e08b55a3ddf523699717617688097d61d66c1297f01d988d8b97f1d6572",
+    "regreso_y_reanudacion": true
+  },
+  {
+    "semilla": 82001,
+    "pasos": 460,
+    "salas_generadas": 5,
+    "entrada": "402016937ffa48c5a688d306747ef015229b159f26bcc595eba1b3ced8abebe6",
+    "mapa": "fcc9d77602fe146afcf8384ce3210eb11c96bcc4ff8ec3c5e8888b57f7caa818",
+    "regreso_y_reanudacion": true
+  },
+  {
+    "semilla": 82002,
+    "pasos": 650,
+    "salas_generadas": 6,
+    "entrada": "c2d7de3fd7bd30b463c358f947ab478d4b096b1bcf84a55919c0c655942b1051",
+    "mapa": "3f2b0d08fc629276104f116d63f1452926c9291683a81886f13c3aa98a0e652c",
+    "regreso_y_reanudacion": true
+  },
+  {
+    "semilla": 82003,
+    "pasos": 361,
+    "salas_generadas": 4,
+    "entrada": "f3997483f1da763b2a7fe5e1d304ed3c563e842a31147a22d777f5752d78efbd",
+    "mapa": "457605d1dd186409993277542426a0df9a93f13fa6d442dbee0310b9953ab3a5",
+    "regreso_y_reanudacion": true
+  },
+  {
+    "semilla": 82004,
+    "pasos": 570,
+    "salas_generadas": 6,
+    "entrada": "4b2d69e39a8eb7100ca22bbd4f103eb2d94f6e1a4e53fb11588dcf615ff7f976",
+    "mapa": "51364671b68514a8816fe403e4502ab8092aaf073e4ece6f79cff9c8eaad3245",
+    "regreso_y_reanudacion": true
+  },
+  {
+    "semilla": 82005,
+    "pasos": 414,
+    "salas_generadas": 4,
+    "entrada": "2a48ce5bbdf70b25897d7738bb69607a6866d7058de793f2541ca01cae4e44ec",
+    "mapa": "adc39515da808fa05a8e4506e59340155ecde71b85d45765ce10c38626cde50a",
+    "regreso_y_reanudacion": true
+  },
+  {
+    "semilla": 82006,
+    "pasos": 597,
+    "salas_generadas": 6,
+    "entrada": "ae2c2699a9806d5e24dd47f565e3d42dbedc4d08f742111d15e1b94146a209c3",
+    "mapa": "a60420ff1d44c26e5fc3f06d9b9d39ab2932ee62ba5561cba287c43666739d0f",
+    "regreso_y_reanudacion": true
+  },
+  {
+    "semilla": 82007,
+    "pasos": 482,
+    "salas_generadas": 5,
+    "entrada": "a1ffea187e176750020c1e3bc7ae10c5152fe94f5c363a7955ab378bcd57a38b",
+    "mapa": "10f05071c7cbe45ee31dd88ea738be1b29bbca1135467a2961faa14398d736d8",
+    "regreso_y_reanudacion": true
+  }
+]

@@ -12,7 +12,13 @@ from salas import ABAJO, ARRIBA, DERECHA, IZQUIERDA, GeneradorNeuronal, reducir
 
 
 def avanzar(juego, orden):
-    return juego.travel(orden - 32) if orden > 32 else juego.step(botones(orden))
+    if orden == 64:
+        return juego.restore_camera()
+    if orden > 64:
+        return juego.travel(orden - 64)
+    if orden > 32:
+        return juego.travel(orden - 32, legacy=True)
+    return juego.step(botones(orden))
 
 
 def huella(frame):
@@ -150,6 +156,14 @@ class Partida:
                     raise ValueError(
                         "Este motor no reproduce la partida guardada. Se conserva el guardado."
                     )
+                frame = self.game.frame
+                if (
+                    frame.end == "playing"
+                    and frame.camera_room == 0
+                    and frame.state[1] in self.vistas
+                    and any(32 < a < 57 for a in self.historia)
+                ):
+                    self.paso(64)
             biblioteca.activar(mundo)
         except BaseException:
             self.game.close()
@@ -194,7 +208,7 @@ class Partida:
                 if juego.frame.state != antes.state or juego.frame.index != antes.index:
                     continue
                 previa_reconstruida = juego.frame
-                f = juego.step(botones(mask))
+                f = avanzar(juego, mask)
                 if f.state[1] == sala and f.end == "playing":
                     aceptar = True
                     return juego, mapa, ruta, previa_reconstruida
@@ -212,10 +226,10 @@ class Partida:
             return self.game.frame
         if self.game.frame.end != "playing":
             raise ValueError("Reintenta desde la entrada para seguir explorando.")
-        return self.paso(32 + sala)
+        return self.paso(64 + sala)
 
     def paso(self, mask):
-        if mask > 32 and mask - 32 not in self.vistas:
+        if mask > 32 and mask != 64 and mask % 32 not in self.vistas:
             raise ValueError("La sala todavía está sin explorar.")
         antes = self.game.frame
         nuevo_juego = None

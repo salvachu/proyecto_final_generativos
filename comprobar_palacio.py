@@ -32,15 +32,31 @@ def probar_viaje(motor, mapa, seed, ruta):
             f = partida.viajar(1)
             assert (
                 f.state[1] == 1
+                and f.camera_room == 1
+                and (f.rgb[:185].min(axis=2) > 225).any()
                 and f.index == antes.index + 1
                 and f.state[5] == antes.state[5]
             )
             f = partida.viajar(2)
-            assert f.state[1] == 2
+            assert f.state[1] == f.camera_room == 2
+            for _ in range(4):
+                f = partida.paso(0)
+                assert f.state[1] == f.camera_room == 2
             firma = huella(f)
             partida.game.close()
             partida = Partida(bib, motor, mundo)
             assert huella(partida.game.frame) == firma and partida.mapa == mapa
+            # Reproducir un clic hecho con la versión que dibujaba la sala cero.
+            legado = partida.paso(33)
+            assert legado.camera_room == 0 and legado.state[1] == 1
+            partida.game.close()
+            partida = Partida(bib, motor, mundo)
+            reparado = partida.game.frame
+            assert reparado.camera_room == reparado.state[1] == 1
+            assert (reparado.rgb[:185].min(axis=2) > 225).any()
+            partida.game.close()
+            partida = Partida(bib, motor, mundo)
+            assert huella(partida.game.frame) == huella(reparado)
         finally:
             partida.game.close()
             bib.db.close()

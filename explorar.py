@@ -5,7 +5,6 @@ import secrets
 import sqlite3
 import sys
 import tkinter as tk
-import zlib
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 from tkinter import messagebox, ttk
@@ -58,7 +57,7 @@ class Explorador:
         self.motor = MotorTemporal()
         self.executor = ThreadPoolExecutor(max_workers=1)
         self.creacion = None
-        self.partida = self.timer = self.seleccion = None
+        self.partida = self.timer = self.mapa_dibujado = None
         self.teclas = set()
         self.jugando = False
         root.title("Prince of Persia · Nivel original y mazmorras generadas")
@@ -87,19 +86,25 @@ class Explorador:
         lateral = tk.Frame(cuerpo, bg=PANEL, padx=12, pady=9)
         lateral.grid(row=0, column=1, sticky="nsew", padx=(12, 0))
         self.texto(lateral, "Mapa explorado", 15, TEXTO, True).pack(anchor="w")
-        self.contador = self.texto(lateral, "", 10, ORO)
+        self.ubicacion = self.texto(lateral, "", 12, ORO, True)
+        self.ubicacion.pack(anchor="w", pady=(8, 0))
+        self.contador = self.texto(lateral, "", 10, GRIS)
         self.contador.pack(anchor="w")
         self.mapa = tk.Canvas(
-            lateral, width=238, height=84, bg=PANEL, highlightthickness=0
+            lateral, width=254, height=158, bg=PANEL, highlightthickness=0
         )
         self.mapa.pack(anchor="w", pady=(6, 1))
-        self.texto(lateral, "Haz clic en una sala para viajar.", 10, GRIS).pack(
-            anchor="w"
+        self.mapa.bind(
+            "<Motion>", lambda e: self.ayuda_mapa(self.destino_bajo_cursor())
         )
-        self.titulo_recuerdo = self.texto(lateral, "", 12, TEXTO, True)
-        self.titulo_recuerdo.pack(anchor="w", pady=(14, 5))
-        self.recuerdo = tk.Label(lateral, bg=PANEL, borderwidth=0)
-        self.recuerdo.pack(anchor="w")
+        self.mapa.bind("<Leave>", lambda e: self.ayuda_mapa())
+        self.mapa.bind("<Button-1>", self.clic_mapa)
+        self.desplazar = ttk.Scrollbar(
+            lateral, orient="horizontal", command=self.mapa.xview
+        )
+        self.mapa.configure(xscrollcommand=self.desplazar.set)
+        self.accion_mapa = self.texto(lateral, "", 10, TEXTO)
+        self.accion_mapa.pack(anchor="w", pady=(8, 0))
         self.estado = self.texto(main, "", 12, ORO, True)
         self.estado.grid(row=2, column=0, columnspan=2, sticky="w")
         self.pista = self.texto(main, "", 11, TEXTO)
@@ -220,7 +225,7 @@ class Explorador:
         self.lista.current(
             next(j for j, (i, _) in enumerate(self.mundos) if i == mundo)
         )
-        self.seleccion = None
+        self.mapa_dibujado = None
         self.mostrar()
         self.root.focus_set()
 
@@ -313,14 +318,34 @@ class Explorador:
         foto = Image.fromarray(frame.rgb).resize((512, 320), Image.Resampling.NEAREST)
         self.vista.image = ImageTk.PhotoImage(foto)
         self.vista.configure(image=self.vista.image)
+        self.dibujar_mapa()
+        self.rotulo()
+
+    def dibujar_mapa(self):
+        p = self.partida
+        actual = p.game.frame.state[1]
+        jugable = p.game.frame.end == "playing"
+        clave = (p.id, actual, frozenset(p.vistas), jugable)
+        if self.mapa_dibujado == clave:
+            return
+        self.mapa_dibujado = clave
         plano = posiciones(p.mapa)
+        self.ubicacion.config(text=f"Estás en la sala {actual}")
         self.contador.config(text=f"{len(p.vistas)} de {len(plano)} salas descubiertas")
         self.mapa.delete("all")
+        self.ayuda_mapa()
         visibles = {s: plano[s] for s in p.vistas if s in plano}
         xs, ys = zip(*visibles.values())
-        dx = min(33, 232 // (max(xs) - min(xs) + 1))
-        dy = min(32, 80 // (max(ys) - min(ys) + 1))
-        w, h = dx - 3, dy - 3
+        dx, dy, w, h = 50, 46, 42, 36
+        ancho = max(254, dx * (max(xs) - min(xs) + 1))
+        self.mapa.configure(scrollregion=(0, 0, ancho, 158))
+        if ancho > 254:
+            self.desplazar.pack(fill="x", before=self.accion_mapa)
+            cx = (plano.get(actual, (min(xs), 0))[0] - min(xs)) * dx + dx / 2
+            self.mapa.xview_moveto(max(0, cx - 127) / ancho)
+        else:
+            self.desplazar.pack_forget()
+            self.mapa.xview_moveto(0)
         for sala, (col, fila) in visibles.items():
             x, y = 3 + dx * (col - min(xs)), 3 + dy * (fila - min(ys))
             links = p.mapa[1952 + 4 * (sala - 1) : 1956 + 4 * (sala - 1)]
@@ -328,51 +353,68 @@ class Explorador:
                 self.mapa.create_line(x + w, y + h / 2, x + dx, y + h / 2, fill=GRIS)
             if links[3] in p.vistas:
                 self.mapa.create_line(x + w / 2, y + h, x + w / 2, y + dy, fill=GRIS)
-            actual = sala == frame.state[1]
+            aqui = sala == actual
             tag = f"s{sala}"
             self.mapa.create_rectangle(
                 x,
                 y,
                 x + w,
                 y + h,
-                fill=ORO if actual else "#334857",
-                outline=ORO if sala == self.seleccion else GRIS,
+                fill=ORO if aqui else "#334857",
+                outline=ORO if aqui else GRIS,
                 tags=tag,
             )
             self.mapa.create_text(
                 x + w / 2,
                 y + h / 2,
                 text=str(sala),
-                fill=FONDO if actual else TEXTO,
+                font=("Segoe UI", 11, "bold"),
+                fill=FONDO if aqui else TEXTO,
                 tags=tag,
             )
-            self.mapa.tag_bind(tag, "<Button-1>", lambda e, s=sala: self.ver_sala(s))
-        self.mostrar_recuerdo()
-        self.rotulo()
+
+    def destino_bajo_cursor(self):
+        frame = self.partida.game.frame
+        if frame.end == "playing":
+            for tag in self.mapa.gettags("current"):
+                if tag.startswith("s") and tag[1:].isdigit():
+                    sala = int(tag[1:])
+                    if sala != frame.state[1]:
+                        return sala
+        return None
+
+    def clic_mapa(self, _evento):
+        sala = self.destino_bajo_cursor()
+        if sala is not None:
+            self.ver_sala(sala)
+
+    def ayuda_mapa(self, destino=None):
+        self.mapa.configure(cursor="hand2" if destino else "")
+        texto = "Haz clic en otra sala para viajar."
+        if destino:
+            texto = f"Viajar a la sala {destino}"
+        elif self.partida.game.frame.end != "playing":
+            texto = "Este intento ha terminado."
+        elif len(self.partida.vistas) == 1:
+            texto = "Explora otra sala para poder volver."
+        self.accion_mapa.config(text=texto)
 
     def ver_sala(self, sala):
         self.pausar()
         try:
             frame = self.partida.viajar(sala)
-            self.seleccion = frame.state[1]
             self.mostrar()
-            if self.seleccion != sala:
+            if frame.state[1] != sala:
                 self.estado.config(
                     text="Esta sala ya no tiene un punto de llegada seguro."
+                )
+            else:
+                self.estado.config(
+                    text=f"Llegaste a la sala {sala}. Pulsa A o D para moverte."
                 )
             self.root.focus_set()
         except (ValueError, OSError, RuntimeError, sqlite3.Error) as e:
             self.estado.config(text=str(e))
-
-    def mostrar_recuerdo(self):
-        sala = self.seleccion or self.partida.game.frame.state[1]
-        rgb = zlib.decompress(self.partida.vistas[sala])
-        mini = Image.frombytes("RGB", (96, 60), rgb).resize(
-            (192, 120), Image.Resampling.NEAREST
-        )
-        self.recuerdo.image = ImageTk.PhotoImage(mini)
-        self.recuerdo.configure(image=self.recuerdo.image)
-        self.titulo_recuerdo.config(text=f"Última visita  ·  Sala {sala}")
 
     def cerrar(self):
         self.pausar()

@@ -44,11 +44,14 @@ def prepare_engine(directory=DEFAULT_ENGINE):
             result = subprocess.run([*git, "apply", "--reverse", "--check", "-"],
                                     input=patch, capture_output=True)
             return result.returncode == 0
-        if not applied(travel):
-            capture = native.joinpath("capture.patch").read_bytes()
-            if not applied(capture):
-                subprocess.run([*git, "apply", "-"], input=capture, check=True)
-            subprocess.run([*git, "apply", "-"], input=travel, check=True)
+        camera = native.joinpath("camera.patch").read_bytes()
+        if not applied(camera):
+            if not applied(travel):
+                capture = native.joinpath("capture.patch").read_bytes()
+                if not applied(capture):
+                    subprocess.run([*git, "apply", "-"], input=capture, check=True)
+                subprocess.run([*git, "apply", "-"], input=travel, check=True)
+            subprocess.run([*git, "apply", "-"], input=camera, check=True)
         subprocess.run(["make", "-C", str(root / "src"), "-j", str(min(4, os.cpu_count() or 1))],
                        check=True)
 
@@ -97,6 +100,7 @@ class Frame:
     end: str
     state: tuple[int, ...]
     rgb: np.ndarray
+    camera_room: int | None = None
 
 
 def _read_frames(pipe, messages):
@@ -106,18 +110,20 @@ def _read_frames(pipe, messages):
             if not line:
                 raise EOFError("El motor cerró el canal de captura.")
             fields = line.decode("ascii").split()
-            if len(fields) != 6 + len(STATE_KEYS) or fields[0] != "POP1":
+            state_end = 6 + len(STATE_KEYS)
+            if len(fields) not in (state_end, state_end + 1) or fields[0] != "POP1":
                 raise ValueError("El motor no reconoce el protocolo de captura. Ejecuta setup.")
             step, mask, dt, next_dt = map(int, fields[1:5])
             end = fields[5]
             if end not in ("playing", *NATIVE_ENDS) or next_dt <= 0:
                 raise ValueError("Estado del motor no válido.")
-            state = tuple(map(int, fields[6:]))
+            state = tuple(map(int, fields[6:state_end]))
+            camera = int(fields[state_end]) if len(fields) > state_end else None
             payload = pipe.read(200 * 320 * 3)
             if len(payload) != 200 * 320 * 3:
                 raise EOFError("Llegó una imagen incompleta.")
             rgb = np.frombuffer(payload, np.uint8).reshape(RGB_SHAPE)
-            messages.put(Frame(step, mask, dt, next_dt, end, state, rgb))
+            messages.put(Frame(step, mask, dt, next_dt, end, state, rgb, camera))
             if end != "playing":
                 return
     except (OSError, ValueError, EOFError) as error:
@@ -144,7 +150,7 @@ class Game:
                            SDL_RENDER_DRIVER="software")
         self.messages = queue.Queue()
         self.process = subprocess.Popen(
-            [str(binary), "--recorder", str(self.level), f"seed={self.seed}", "mute"],
+            [str(binary), "--recorder", str(self.level), f"seed={self.seed}", "mute", "--recorder-camera"],
             cwd=self.directory, env=environment, stdin=subprocess.PIPE, stdout=subprocess.PIPE,
         )
         self.reader = threading.Thread(target=_read_frames, args=(self.process.stdout, self.messages),
@@ -173,11 +179,16 @@ class Game:
     def step(self, buttons=()):
         return self._command(action_mask(buttons))
 
-    def travel(self, room):
+    def travel(self, room, *, legacy=False):
         room = operator.index(room)
         if not 1 <= room <= 24:
             raise ValueError("La sala debe estar entre 1 y 24.")
-        return self._command(32 + room)
+        if not legacy and self.frame.camera_room is None:
+            raise RuntimeError("Actualiza el motor para usar el viaje entre salas.")
+        return self._command((32 if legacy else 64) + room)
+
+    def restore_camera(self):
+        return self._command(64)
 
     def _command(self, mask):
         if self.process is None or self.frame.end != "playing":

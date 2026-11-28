@@ -20,7 +20,7 @@ py -3.13 -m venv .venv
 
 - **Nivel 1 original** abre o reanuda el mapa original. **Generar nivel** prepara otra variante y la abre en cuanto SDLPoP comprueba un recorrido hasta la salida. Puedes retomar cada partida desde la lista.
 - **A / D** o las flechas mueven al príncipe. **W** salta y **W + Shift** permite agarrarse a un borde. **S** sirve para agacharse o bajar. Frente a la espada, mantén **Shift** para recogerla. En combate, **Shift** ataca y **W** bloquea. Ante la puerta abierta, pulsa **W** para salir.
-- **P** pausa o reanuda. **Espacio** reanuda en reposo. Un clic en una sala descubierta pausa el juego y lleva al príncipe allí. El viaje mantiene el inventario, la vida y las modificaciones del escenario. Reanuda con una tecla de movimiento.
+- **P** pausa o reanuda. **Espacio** reanuda en reposo. La sala dorada indica dónde estás. Pasa el cursor sobre otra sala descubierta para ver el destino y haz clic para viajar. El príncipe aparece en la sala elegida con su inventario y su vida. Pulsa **A** o **D** para seguir jugando.
 - **Reintentar desde la entrada** empieza otro intento y conserva las salas descubiertas. Cerrar la ventana guarda el último paso confirmado. En Windows, la biblioteca está en `%LOCALAPPDATA%\PrinceOfPersiaMundos\mundos.sqlite3`.
 
 ## Qué genera el modelo

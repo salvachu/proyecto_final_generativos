@@ -35,7 +35,7 @@ def compilar(destino):
         ejecutar("git", "-C", str(repo), "config", "core.autocrlf", "false")
         ejecutar("git", "-C", str(repo), "fetch", "-q", "--depth=1", REPOSITORY, REVISION)
         ejecutar("git", "-C", str(repo), "checkout", "-q", "--detach", "FETCH_HEAD")
-        for nombre in ("capture.patch", "travel.patch"):
+        for nombre in ("capture.patch", "travel.patch", "camera.patch"):
             parche = importlib.resources.files("sdlpop_recorder").joinpath("native", nombre)
             ejecutar("git", "-C", str(repo), "apply", "-", input=parche.read_bytes())
         include = tmp / "include"

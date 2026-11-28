@@ -6,13 +6,16 @@ import sqlite3
 import sys
 import tkinter as tk
 import zlib
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 from tkinter import messagebox, ttk
 
 from PIL import Image, ImageTk
-from niveles import MotorTemporal, Game
-from salas import GeneradorNeuronal
+
+from niveles import MOTOR, RECURSO, Game, MotorTemporal
+from palacio import nuevo_palacio, posiciones
 from partidas import Biblioteca, Partida
+from salas import GeneradorNeuronal
 
 FONDO, PANEL, TEXTO, ORO, GRIS = "#111b24", "#1c2934", "#f5eddd", "#efbb73", "#a9bac5"
 TECLAS = {
@@ -38,7 +41,9 @@ FIN = {
 
 def directorio_usuario():
     if sys.platform == "win32":
-        return Path(os.environ.get("LOCALAPPDATA", Path.home())) / "PrinceOfPersiaMundos"
+        return (
+            Path(os.environ.get("LOCALAPPDATA", Path.home())) / "PrinceOfPersiaMundos"
+        )
     return (
         Path(os.environ.get("XDG_DATA_HOME", Path.home() / ".local/share"))
         / "prince-of-persia-mundos"
@@ -51,20 +56,30 @@ class Explorador:
         self.bib = Biblioteca((carpeta or directorio_usuario()) / "mundos.sqlite3")
         self.modelo = GeneradorNeuronal()
         self.motor = MotorTemporal()
+        self.executor = ThreadPoolExecutor(max_workers=1)
+        self.creacion = None
         self.partida = self.timer = self.seleccion = None
         self.teclas = set()
         self.jugando = False
-        root.title("Prince of Persia · Mazmorras generadas")
+        root.title("Prince of Persia · Nivel original y mazmorras generadas")
         root.configure(bg=FONDO)
         main = tk.Frame(root, bg=FONDO, padx=18, pady=14)
         main.pack()
-        self.texto(main, "Mazmorras de Persia", 23, TEXTO, True).grid(row=0, column=0, sticky="w")
+        self.texto(main, "Mazmorras de Persia", 23, TEXTO, True).grid(
+            row=0, column=0, sticky="w"
+        )
         barra = tk.Frame(main, bg=FONDO)
         barra.grid(row=0, column=1, sticky="e")
-        self.lista = ttk.Combobox(barra, width=26, state="readonly", takefocus=False)
+        self.lista = ttk.Combobox(barra, width=21, state="readonly", takefocus=False)
         self.lista.pack(side="left", padx=(0, 6))
         self.lista.bind("<<ComboboxSelected>>", self.elegir)
-        ttk.Button(barra, text="Nuevo nivel", command=self.nuevo, takefocus=False).pack(side="left")
+        ttk.Button(
+            barra, text="Nivel 1 original", command=self.original, takefocus=False
+        ).pack(side="left", padx=(0, 4))
+        self.generar = ttk.Button(
+            barra, text="Generar nivel", command=self.nuevo, takefocus=False
+        )
+        self.generar.pack(side="left")
         cuerpo = tk.Frame(main, bg=FONDO)
         cuerpo.grid(row=1, column=0, columnspan=2, pady=(12, 8))
         self.vista = tk.Label(cuerpo, bg="black", borderwidth=0)
@@ -74,33 +89,38 @@ class Explorador:
         self.texto(lateral, "Mapa explorado", 15, TEXTO, True).pack(anchor="w")
         self.contador = self.texto(lateral, "", 10, ORO)
         self.contador.pack(anchor="w")
-        self.mapa = tk.Canvas(lateral, width=238, height=84, bg=PANEL, highlightthickness=0)
+        self.mapa = tk.Canvas(
+            lateral, width=238, height=84, bg=PANEL, highlightthickness=0
+        )
         self.mapa.pack(anchor="w", pady=(6, 1))
-        self.texto(lateral, "Pulsa una sala para recordarla.", 10, GRIS).pack(anchor="w")
+        self.texto(lateral, "Haz clic en una sala para viajar.", 10, GRIS).pack(
+            anchor="w"
+        )
         self.titulo_recuerdo = self.texto(lateral, "", 12, TEXTO, True)
         self.titulo_recuerdo.pack(anchor="w", pady=(14, 5))
         self.recuerdo = tk.Label(lateral, bg=PANEL, borderwidth=0)
         self.recuerdo.pack(anchor="w")
         self.estado = self.texto(main, "", 12, ORO, True)
         self.estado.grid(row=2, column=0, columnspan=2, sticky="w")
+        self.pista = self.texto(main, "", 11, TEXTO)
+        self.pista.grid(row=3, column=0, columnspan=2, sticky="w")
         self.texto(
             main,
-            "Explora hacia la derecha, pisa la placa y pulsa W ante la puerta abierta.",
-            11,
-            TEXTO,
-        ).grid(row=3, column=0, columnspan=2, sticky="w")
-        self.texto(
-            main,
-            "A / D   mover     W   saltar o trepar     S   bajar     Shift   agarrarse     P   pausa",
+            "A / D   mover     W   saltar o bloquear     S   bajar     Shift   agarrar, recoger o atacar     P   pausa",
             10,
             GRIS,
         ).grid(row=4, column=0, columnspan=2, sticky="w", pady=(2, 7))
         controles = tk.Frame(main, bg=FONDO)
         controles.grid(row=5, column=0, columnspan=2, sticky="w")
-        self.play = ttk.Button(controles, text="Jugar", command=self.alternar, takefocus=False)
+        self.play = ttk.Button(
+            controles, text="Jugar", command=self.alternar, takefocus=False
+        )
         self.play.pack(side="left", padx=(0, 5))
         ttk.Button(
-            controles, text="Reintentar desde la entrada", command=self.reintentar, takefocus=False
+            controles,
+            text="Reintentar desde la entrada",
+            command=self.reintentar,
+            takefocus=False,
         ).pack(side="left")
         root.bind("<KeyPress>", self.pulsar)
         root.bind("<KeyRelease>", lambda e: self.teclas.discard(e.keysym.lower()))
@@ -111,7 +131,7 @@ class Explorador:
             if mundos:
                 self.abrir(mundos[0][0])
             else:
-                self.nuevo()
+                self.original()
         else:
             self.abrir(self.bib.activo())
 
@@ -126,19 +146,48 @@ class Explorador:
             font=("Segoe UI", size, "bold" if bold else "normal"),
         )
 
-    def nuevo(self):
+    def original(self):
         self.pausar()
-        self.estado.config(text="El world model está generando la entrada…")
-        self.root.update_idletasks()
+        mundo = self.bib.original()
+        if mundo is None:
+            mapa = (MOTOR / RECURSO).read_bytes()
+            self.motor.cargar(mapa)
+            with Game(self.motor.ruta, 1, 1) as g:
+                mundo = self.bib.crear(1, mapa, b"", g.frame, tipo="original")
+        self.abrir(mundo)
+
+    def construir(self, seed):
+        # El motor y SQLite de la partida activa pertenecen al hilo de la interfaz.
+        motor = MotorTemporal()
         try:
-            seed = secrets.randbelow(2**31)
-            mapa, ruta = self.modelo.entrada_nueva(self.motor, seed)
+            return nuevo_palacio(motor, self.modelo, seed)
+        finally:
+            motor.cerrar()
+
+    def nuevo(self):
+        if self.creacion:
+            return
+        self.pausar()
+        self.generar.configure(state="disabled", text="Generando…")
+        seed = secrets.randbelow(2**31)
+        self.creacion = self.executor.submit(self.construir, seed)
+        self.recibir_nivel(seed)
+
+    def recibir_nivel(self, seed):
+        if not self.creacion.done():
+            self.root.after(100, self.recibir_nivel, seed)
+            return
+        try:
+            mapa, ruta = self.creacion.result()
+            self.motor.cargar(mapa)
             with Game(self.motor.ruta, 1, seed) as g:
-                mundo = self.bib.crear(seed, mapa, ruta, g.frame, neuronal=True)
+                mundo = self.bib.crear(seed, mapa, ruta, g.frame, tipo="palacio")
             self.abrir(mundo)
         except (OSError, ValueError, RuntimeError, sqlite3.Error) as e:
             messagebox.showerror("Creación del nivel", str(e), parent=self.root)
-            self.estado.config(text="No se pudo crear el nivel.")
+        finally:
+            self.creacion = None
+            self.generar.configure(state="normal", text="Generar nivel")
 
     def elegir(self, _evento):
         self.abrir(self.mundos[self.lista.current()][0])
@@ -151,8 +200,26 @@ class Explorador:
             self.partida.game.close()
         self.partida = nueva
         self.mundos = self.bib.listar()
-        self.lista.configure(values=[f"Mundo {i}  ·  {s}" for i, s in self.mundos])
-        self.lista.current(next(j for j, (i, _) in enumerate(self.mundos) if i == mundo))
+        original = self.bib.original()
+        edicion = self.bib.db.execute(
+            "SELECT tipo FROM edicion WHERE mundo=?", (mundo,)
+        ).fetchone()
+        self.pista.configure(
+            text=(
+                "Busca la espada, explora las galerías y pulsa W ante la salida abierta."
+                if edicion
+                else "Explora hacia la derecha, pisa la placa y pulsa W ante la salida abierta."
+            )
+        )
+        self.lista.configure(
+            values=[
+                "Nivel 1 original" if i == original else f"Mundo {i}  ·  {s}"
+                for i, s in self.mundos
+            ]
+        )
+        self.lista.current(
+            next(j for j, (i, _) in enumerate(self.mundos) if i == mundo)
+        )
         self.seleccion = None
         self.mostrar()
         self.root.focus_set()
@@ -246,51 +313,70 @@ class Explorador:
         foto = Image.fromarray(frame.rgb).resize((512, 320), Image.Resampling.NEAREST)
         self.vista.image = ImageTk.PhotoImage(foto)
         self.vista.configure(image=self.vista.image)
-        n = p.mapa[2048]
-        etiqueta = "generadas por la red" if p.red is not None else "descubiertas · mapa anterior"
-        self.contador.config(text=f"{len(p.vistas)} de {n} salas {etiqueta}")
+        plano = posiciones(p.mapa)
+        self.contador.config(text=f"{len(p.vistas)} de {len(plano)} salas descubiertas")
         self.mapa.delete("all")
-        for sala in p.vistas:
-            col = p.mapa[2049 + sala - 1] - 1
-            fila = p.mapa[2073 + sala - 1] - 1
-            x, y = 3 + 33 * col, 5 + 36 * fila
+        visibles = {s: plano[s] for s in p.vistas if s in plano}
+        xs, ys = zip(*visibles.values())
+        dx = min(33, 232 // (max(xs) - min(xs) + 1))
+        dy = min(32, 80 // (max(ys) - min(ys) + 1))
+        w, h = dx - 3, dy - 3
+        for sala, (col, fila) in visibles.items():
+            x, y = 3 + dx * (col - min(xs)), 3 + dy * (fila - min(ys))
             links = p.mapa[1952 + 4 * (sala - 1) : 1956 + 4 * (sala - 1)]
             if links[1] in p.vistas:
-                self.mapa.create_line(x + 26, y + 13, x + 34, y + 13, fill=GRIS)
+                self.mapa.create_line(x + w, y + h / 2, x + dx, y + h / 2, fill=GRIS)
             if links[3] in p.vistas:
-                self.mapa.create_line(x + 13, y + 24, x + 13, y + 37, fill=GRIS)
+                self.mapa.create_line(x + w / 2, y + h, x + w / 2, y + dy, fill=GRIS)
             actual = sala == frame.state[1]
             tag = f"s{sala}"
             self.mapa.create_rectangle(
                 x,
                 y,
-                x + 26,
-                y + 25,
+                x + w,
+                y + h,
                 fill=ORO if actual else "#334857",
                 outline=ORO if sala == self.seleccion else GRIS,
                 tags=tag,
             )
             self.mapa.create_text(
-                x + 13, y + 12, text=str(sala), fill=FONDO if actual else TEXTO, tags=tag
+                x + w / 2,
+                y + h / 2,
+                text=str(sala),
+                fill=FONDO if actual else TEXTO,
+                tags=tag,
             )
             self.mapa.tag_bind(tag, "<Button-1>", lambda e, s=sala: self.ver_sala(s))
         self.mostrar_recuerdo()
         self.rotulo()
 
     def ver_sala(self, sala):
-        self.seleccion = sala
-        self.mostrar()
+        self.pausar()
+        try:
+            frame = self.partida.viajar(sala)
+            self.seleccion = frame.state[1]
+            self.mostrar()
+            if self.seleccion != sala:
+                self.estado.config(
+                    text="Esta sala ya no tiene un punto de llegada seguro."
+                )
+            self.root.focus_set()
+        except (ValueError, OSError, RuntimeError, sqlite3.Error) as e:
+            self.estado.config(text=str(e))
 
     def mostrar_recuerdo(self):
         sala = self.seleccion or self.partida.game.frame.state[1]
         rgb = zlib.decompress(self.partida.vistas[sala])
-        mini = Image.frombytes("RGB", (96, 60), rgb).resize((192, 120), Image.Resampling.NEAREST)
+        mini = Image.frombytes("RGB", (96, 60), rgb).resize(
+            (192, 120), Image.Resampling.NEAREST
+        )
         self.recuerdo.image = ImageTk.PhotoImage(mini)
         self.recuerdo.configure(image=self.recuerdo.image)
         self.titulo_recuerdo.config(text=f"Última visita  ·  Sala {sala}")
 
     def cerrar(self):
         self.pausar()
+        self.executor.shutdown(wait=False, cancel_futures=True)
         if self.partida:
             self.partida.game.close()
         self.motor.cerrar()

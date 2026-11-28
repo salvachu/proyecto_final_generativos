@@ -49,13 +49,13 @@ def politica(rng, modo):
             restante -= 1
 
 
-def ruta_salida(rng):
+def ruta_salida(rng, limite=400):
     espera = rng.randint(0, 22)
     pausa = rng.randint(18, 36)
     sala_final = 0
     instante_palanca = None
     accion = ()
-    for t in range(400):
+    for t in range(limite):
         frame = yield accion
         _, sala, x, y, direccion, _, animacion, _ = frame.state
         if t < espera:

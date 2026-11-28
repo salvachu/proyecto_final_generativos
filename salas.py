@@ -23,7 +23,13 @@ INICIAL, MISMA, DERECHA, IZQUIERDA, ABAJO, ARRIBA = range(6)
 
 def rol(sala, total):
     return (
-        INICIO if sala == 1 else SOTANO if sala == total else META if sala == total - 1 else PASILLO
+        INICIO
+        if sala == 1
+        else SOTANO
+        if sala == total
+        else META
+        if sala == total - 1
+        else PASILLO
     )
 
 
@@ -35,7 +41,9 @@ def tokens(mapa, sala):
         alto = bajo == MURO or (medio not in (0, MURO) and bajo == 0)
         piso = medio if alto else bajo
         t = 0 if techo == 0 else 1 if techo == MURO else 2
-        resultado.append((0 if alto else 12) + 4 * t + (PISOS.index(piso) if piso in PISOS else 0))
+        resultado.append(
+            (0 if alto else 12) + 4 * t + (PISOS.index(piso) if piso in PISOS else 0)
+        )
     return resultado
 
 
@@ -61,15 +69,20 @@ def estructura(seed):
     data[1952 + 4 * n + 2] = 1
     data[2049 + n], data[2073 + n] = 1, 2
     salida = rng.choice((5, 6))
-    data[1440], data[1441], data[1697] = 128, 128 | ((n & 3) << 5) | (20 + salida), (n & 28) << 3
+    data[1440], data[1441], data[1697] = (
+        128,
+        128 | ((n & 3) << 5) | (20 + salida),
+        (n & 28) << 3,
+    )
     for sala in range(1, n + 2):
         data = bytearray(escribir(data, sala, [0] * 10))
     return bytes(data)
 
 
-def escribir(mapa, sala, codigos):
+def escribir(mapa, sala, codigos, tipo=None):
     data = bytearray(mapa)
-    tipo = rol(sala, data[2048])
+    if tipo is None:
+        tipo = rol(sala, data[2048])
     fg = np.zeros((3, 10), np.uint8)
     bg = np.zeros_like(fg)
     for x, token in enumerate(codigos):
@@ -123,11 +136,34 @@ class GeneradorNeuronal:
         opts = ort.SessionOptions()
         opts.intra_op_num_threads = 1
         self.red = ort.InferenceSession(
-            str(directorio / "mundo_salas.onnx"), opts, providers=["CPUExecutionProvider"]
+            str(directorio / "mundo_salas.onnx"),
+            opts,
+            providers=["CPUExecutionProvider"],
         )
-        self.entrada = np.array(Image.open(directorio / "contexto_entrada.png").convert("RGB"))
+        self.entrada = np.array(
+            Image.open(directorio / "contexto_entrada.png").convert("RGB")
+        )
 
-    def generar(self, mapa, sala, origen, anterior, actual, mask, direccion, seed, intento=0):
+    def generar(
+        self, mapa, sala, origen, anterior, actual, mask, direccion, seed, intento=0
+    ):
+        codigos = self.columnas(
+            mapa,
+            sala,
+            origen,
+            anterior,
+            actual,
+            mask,
+            direccion,
+            seed,
+            intento,
+            rol(sala, mapa[2048]),
+        )
+        return escribir(mapa, sala, codigos)
+
+    def columnas(
+        self, mapa, sala, origen, anterior, actual, mask, direccion, seed, intento, tipo
+    ):
         bits = np.array([[(mask >> j) & 1 for j in range(5)]], dtype=np.float32)
         prefijo = np.full((1, 10), VACIO, np.int64)
         contexto = tokens(mapa, origen) if origen else [VACIO] * 10
@@ -136,7 +172,7 @@ class GeneradorNeuronal:
             actual=actual.transpose(2, 0, 1)[None].astype("float32") / 255,
             botones=bits,
             vecina=np.array([contexto], np.int64),
-            rol=np.array([rol(sala, mapa[2048])], np.int64),
+            rol=np.array([tipo], np.int64),
             direccion=np.array([direccion], np.int64),
             prefijo=prefijo,
         )
@@ -145,9 +181,11 @@ class GeneradorNeuronal:
             logits = self.red.run(None, feed)[0][0, col].astype(float)
             prob = np.exp((logits - logits.max()) / 1.05)
             prefijo[0, col] = azar.choice(24, p=prob / prob.sum())
-        return escribir(mapa, sala, prefijo[0].tolist())
+        return prefijo[0].tolist()
 
-    def candidata(self, motor, mapa, sala, origen, anterior, actual, mask, direccion, seed):
+    def candidata(
+        self, motor, mapa, sala, origen, anterior, actual, mask, direccion, seed
+    ):
         from niveles import certificar
 
         for intento in range(20):
@@ -160,7 +198,9 @@ class GeneradorNeuronal:
 
     def entrada_nueva(self, motor, seed):
         mapa = estructura(seed)
-        opciones = self.candidata(motor, mapa, 1, 0, self.entrada, self.entrada, 0, INICIAL, seed)
+        opciones = self.candidata(
+            motor, mapa, 1, 0, self.entrada, self.entrada, 0, INICIAL, seed
+        )
         for nivel, ruta in opciones:
             return nivel, ruta
         raise RuntimeError("No se encontró una entrada transitable para esta semilla.")

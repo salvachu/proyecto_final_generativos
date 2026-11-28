@@ -6,8 +6,13 @@ import zlib
 from pathlib import Path
 
 from PIL import Image
+
 from niveles import Game, botones
 from salas import ABAJO, ARRIBA, DERECHA, IZQUIERDA, GeneradorNeuronal, reducir
+
+
+def avanzar(juego, orden):
+    return juego.travel(orden - 32) if orden > 32 else juego.step(botones(orden))
 
 
 def huella(frame):
@@ -37,10 +42,15 @@ class Biblioteca:
             CREATE TABLE IF NOT EXISTS sala_neuronal(
                 mundo INTEGER REFERENCES mundo(id), sala INTEGER, origen INTEGER NOT NULL,
                 accion INTEGER NOT NULL, paso INTEGER NOT NULL, PRIMARY KEY(mundo,sala));
+            CREATE TABLE IF NOT EXISTS edicion(
+                mundo INTEGER PRIMARY KEY REFERENCES mundo(id), tipo TEXT NOT NULL);
+            CREATE UNIQUE INDEX IF NOT EXISTS un_original ON edicion(tipo) WHERE tipo='original';
         """)
 
     def listar(self):
-        return self.db.execute("SELECT id,semilla FROM mundo ORDER BY id DESC").fetchall()
+        return self.db.execute(
+            "SELECT id,semilla FROM mundo ORDER BY id DESC"
+        ).fetchall()
 
     def activo(self):
         fila = self.db.execute("SELECT mundo FROM activo").fetchone()
@@ -51,7 +61,9 @@ class Biblioteca:
             self.db.execute("INSERT OR REPLACE INTO activo VALUES(1,?)", (mundo,))
 
     def visitas(self, mundo):
-        filas = self.db.execute("SELECT sala,imagen FROM visita WHERE mundo=?", (mundo,))
+        filas = self.db.execute(
+            "SELECT sala,imagen FROM visita WHERE mundo=?", (mundo,)
+        )
         return {sala: imagen for sala, imagen in filas}
 
     def visitar(self, mundo, frame):
@@ -62,15 +74,27 @@ class Biblioteca:
         )
         return blob
 
-    def crear(self, seed, mapa, solucion, frame, neuronal=False):
+    def original(self):
+        fila = self.db.execute(
+            "SELECT mundo FROM edicion WHERE tipo='original'"
+        ).fetchone()
+        return fila[0] if fila else None
+
+    def crear(self, seed, mapa, solucion, frame, neuronal=False, tipo=None):
         with self.db:
             cur = self.db.execute(
                 "INSERT INTO mundo(semilla,mapa,solucion,firma) VALUES(?,?,?,?)",
                 (seed, mapa, solucion, huella(frame)),
             )
             self.visitar(cur.lastrowid, frame)
+            if tipo:
+                self.db.execute(
+                    "INSERT INTO edicion VALUES(?,?)", (cur.lastrowid, tipo)
+                )
             if neuronal:
-                self.db.execute("INSERT INTO sala_neuronal VALUES(?,1,0,0,0)", (cur.lastrowid,))
+                self.db.execute(
+                    "INSERT INTO sala_neuronal VALUES(?,1,0,0,0)", (cur.lastrowid,)
+                )
             return cur.lastrowid
 
 
@@ -83,14 +107,18 @@ class Partida:
         db.execute("BEGIN")
         try:
             seed, self.mapa, firma, self.revision, pasos = db.execute(
-                "SELECT semilla,mapa,firma,revision,pasos FROM mundo WHERE id=?", (mundo,)
+                "SELECT semilla,mapa,firma,revision,pasos FROM mundo WHERE id=?",
+                (mundo,),
             ).fetchone()
             acciones = db.execute(
                 "SELECT botones FROM paso WHERE mundo=? ORDER BY t", (mundo,)
             ).fetchall()
             self.vistas = biblioteca.visitas(mundo)
             self.creadas = {
-                s for (s,) in db.execute("SELECT sala FROM sala_neuronal WHERE mundo=?", (mundo,))
+                s
+                for (s,) in db.execute(
+                    "SELECT sala FROM sala_neuronal WHERE mundo=?", (mundo,)
+                )
             }
         finally:
             db.commit()
@@ -107,14 +135,16 @@ class Partida:
                 with db:
                     self.comprobar_revision(huella(self.game.frame), 0)
                     db.execute("DELETE FROM paso WHERE mundo=?", (mundo,))
-                    self.vistas[1] = biblioteca.visitar(mundo, self.game.frame)
+                    self.vistas[self.game.frame.state[1]] = biblioteca.visitar(
+                        mundo, self.game.frame
+                    )
                 self.revision += 1
             else:
                 if pasos != len(acciones):
                     raise ValueError("El registro de la partida está incompleto.")
                 for (mask,) in acciones:
                     self.previa = self.game.frame
-                    self.game.step(botones(mask))
+                    avanzar(self.game, mask)
                     self.historia.append(mask)
                 if huella(self.game.frame) != firma:
                     raise ValueError(
@@ -160,7 +190,7 @@ class Partida:
                 for accion in self.historia:
                     if juego.frame.end != "playing":
                         break
-                    juego.step(botones(accion))
+                    avanzar(juego, accion)
                 if juego.frame.state != antes.state or juego.frame.index != antes.index:
                     continue
                 previa_reconstruida = juego.frame
@@ -175,11 +205,22 @@ class Partida:
             "No se pudo enlazar la nueva sala desde este punto. El paso anterior está guardado."
         )
 
+    def viajar(self, sala):
+        if sala not in self.vistas:
+            raise ValueError("Primero tienes que descubrir esa sala.")
+        if self.game.frame.state[1] == sala:
+            return self.game.frame
+        if self.game.frame.end != "playing":
+            raise ValueError("Reintenta desde la entrada para seguir explorando.")
+        return self.paso(32 + sala)
+
     def paso(self, mask):
+        if mask > 32 and mask - 32 not in self.vistas:
+            raise ValueError("La sala todavía está sin explorar.")
         antes = self.game.frame
         nuevo_juego = None
         try:
-            frame = self.game.step(botones(mask))
+            frame = avanzar(self.game, mask)
             sala = frame.state[1]
             self.ultima_nueva = self.red is not None and sala not in self.creadas
             if self.ultima_nueva:
@@ -189,13 +230,16 @@ class Partida:
                 self.comprobar_revision(huella(frame), frame.index)
                 if nuevo_juego:
                     self.bib.db.execute(
-                        "UPDATE mundo SET mapa=?, solucion=? WHERE id=?", (mapa, ruta, self.id)
+                        "UPDATE mundo SET mapa=?, solucion=? WHERE id=?",
+                        (mapa, ruta, self.id),
                     )
                     self.bib.db.execute(
                         "INSERT INTO sala_neuronal VALUES(?,?,?,?,?)",
                         (self.id, sala, antes.state[1], mask, frame.index),
                     )
-                self.bib.db.execute("INSERT INTO paso VALUES(?,?,?)", (self.id, frame.index, mask))
+                self.bib.db.execute(
+                    "INSERT INTO paso VALUES(?,?,?)", (self.id, frame.index, mask)
+                )
                 mini = self.bib.visitar(self.id, frame)
         except BaseException:
             # Evita seguir desde un estado que no se pudo confirmar en disco.

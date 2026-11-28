@@ -38,12 +38,17 @@ def prepare_engine(directory=DEFAULT_ENGINE):
         revision = subprocess.check_output([*git, "rev-parse", "HEAD"], text=True).strip()
         if revision != REVISION or not (root / ".git").exists():
             raise ValueError(f"La carpeta {root} debe contener la revisión {REVISION} de SDLPoP.")
-        patch = files("sdlpop_recorder").joinpath("native", "capture.patch").read_bytes()
-        already_applied = subprocess.run([*git, "apply", "--reverse", "--check", "-"],
-                                         input=patch, capture_output=True)
-        if already_applied.returncode:
-            subprocess.run([*git, "apply", "--check", "-"], input=patch, check=True)
-            subprocess.run([*git, "apply", "-"], input=patch, check=True)
+        native = files("sdlpop_recorder").joinpath("native")
+        travel = native.joinpath("travel.patch").read_bytes()
+        def applied(patch):
+            result = subprocess.run([*git, "apply", "--reverse", "--check", "-"],
+                                    input=patch, capture_output=True)
+            return result.returncode == 0
+        if not applied(travel):
+            capture = native.joinpath("capture.patch").read_bytes()
+            if not applied(capture):
+                subprocess.run([*git, "apply", "-"], input=capture, check=True)
+            subprocess.run([*git, "apply", "-"], input=travel, check=True)
         subprocess.run(["make", "-C", str(root / "src"), "-j", str(min(4, os.cpu_count() or 1))],
                        check=True)
 
@@ -166,9 +171,17 @@ class Game:
         return result
 
     def step(self, buttons=()):
+        return self._command(action_mask(buttons))
+
+    def travel(self, room):
+        room = operator.index(room)
+        if not 1 <= room <= 24:
+            raise ValueError("La sala debe estar entre 1 y 24.")
+        return self._command(32 + room)
+
+    def _command(self, mask):
         if self.process is None or self.frame.end != "playing":
             raise RuntimeError("El episodio no está activo.")
-        mask = action_mask(buttons)
         self.process.stdin.write(bytes([mask]))
         self.process.stdin.flush()
         self.frame = self._receive(self.frame.index + 1, mask)

@@ -18,6 +18,40 @@ static FILE *frames;
 static unsigned int step_number;
 static int buttons;
 static int dt_ticks;
+static signed char last_tile[25]; // 1-based position on stable ground
+
+static int travel_floor(int room, int pos) {
+	int tile = get_tile(room, pos % 10, pos / 10);
+	return tile == tiles_1_floor || tile == tiles_3_pillar ||
+	       tile == tiles_19_torch || tile == tiles_14_debris;
+}
+
+static void travel_to(int room) {
+	int pos = last_tile[room] - 1;
+	if (pos < 0 || !travel_floor(room, pos)) {
+		// A known room may have been seen only in mid-air or in a previous attempt.
+		for (int i = 0; i < 30; ++i) {
+			pos = (14 + i) % 30;
+			if (travel_floor(room, pos)) break;
+			if (i == 29) return;
+		}
+	}
+	leave_guard();
+	loadkid();
+	Char.room = next_room = room;
+	Char.curr_col = pos % 10;
+	Char.curr_row = pos / 10;
+	Char.x = x_bump[Char.curr_col + FIRST_ONSCREEN_COLUMN] + TILE_SIZEX;
+	Char.y = y_land[Char.curr_row + 1];
+	Char.fall_x = Char.fall_y = 0;
+	Char.sword = sword_0_sheathed;
+	seqtbl_offset_char(seq_2_stand);
+	play_seq();
+	savekid();
+	clear_coll_rooms();
+	exit_room_timer = 2;
+	check_the_end();
+}
 
 void recorder_init(void) {
 	if (!check_param("--recorder")) return;
@@ -42,19 +76,33 @@ int recorder_period(void) {
 void recorder_read_action(void) {
 	int mask = fgetc(stdin);
 	if (mask == EOF) exit(ferror(stdin) ? 2 : 0);
-	if (mask > 31 || (mask & 3) == 3 || (mask & 12) == 12) exit(2);
+	if (mask > 56 || mask == 32 ||
+	    (mask < 32 && ((mask & 3) == 3 || (mask & 12) == 12))) exit(2);
 	buttons = mask;
 	dt_ticks = recorder_period();
+	if (mask > 32) travel_to(mask - 32);
 	++step_number;
 }
 
 void recorder_apply_action(void) {
+	if (buttons > 32) {
+		control_x = control_y = control_shift = CONTROL_RELEASED;
+		return;
+	}
 	control_x = (buttons & 1) ? CONTROL_HELD_LEFT : (buttons & 2) ? CONTROL_HELD_RIGHT : CONTROL_RELEASED;
 	control_y = (buttons & 4) ? CONTROL_HELD_UP : (buttons & 8) ? CONTROL_HELD_DOWN : CONTROL_RELEASED;
 	control_shift = (buttons & 16) ? CONTROL_HELD : CONTROL_RELEASED;
 }
 
 void recorder_frame(void) {
+	// Observe support without get_tile(), which changes global collision state.
+	int pos = Kid.curr_row * 10 + Kid.curr_col;
+	if (Kid.room >= 1 && Kid.room <= 24 && Kid.curr_row >= 0 && Kid.curr_row < 3 &&
+	    Kid.curr_col > 0 && Kid.curr_col < 9 && Kid.y == y_land[Kid.curr_row + 1]) {
+		int tile = level.fg[(Kid.room - 1) * 30 + pos] & 31;
+		if (tile == tiles_1_floor || tile == tiles_3_pillar || tile == tiles_19_torch || tile == tiles_14_debris)
+			last_tile[Kid.room] = pos + 1;
+	}
 	// One post-render observation, including the native HUD, per simulation step.
 	static unsigned char rgb[320 * 200 * 3];
 	SDL_Surface *surface = onscreen_surface_;

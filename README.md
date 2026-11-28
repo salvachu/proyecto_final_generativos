@@ -1,62 +1,48 @@
 # Mazmorras de Persia
 
-El propio world model genera el terreno de las salas mientras juegas. **Nuevo nivel** crea la entrada. Cuando cruzas por primera vez a otra sala, el modelo genera sus plataformas usando lo que acabas de ver, el mapa vecino y los controles del príncipe. El juego guarda la sala para las visitas posteriores. Para probar esta versión después de una actualización, abre la aplicación de nuevo y pulsa **Nuevo nivel**.
+Juega el primer nivel original de *Prince of Persia* o explora una variante creada por el world model. Ambas opciones usan SDLPoP para el movimiento, el combate y las puertas. Cada mundo tiene su propia partida y su propio mapa explorado.
 
 ## Abrir y jugar
 
-En Windows x64, descarga la [aplicación para Windows](https://github.com/salvachu/proyecto_final_generativos/releases/download/v1.0.0/World_model_Prince_of_Persia.zip), **extrae todo el ZIP** y abre **Abrir_demo.cmd**. Incluye la aplicación de escritorio y el motor. También puedes ejecutar directamente **Aplicacion/Mazmorras.exe**. Los datos personales de juego se crean al jugar.
+En la carpeta del proyecto en Windows, ejecuta lo siguiente en PowerShell.
 
-- **D / A** para correr a derecha o izquierda. También funcionan las flechas.
-- **W** para saltar. Para trepar una terraza, acércate al borde, mira hacia él y mantén **W + Shift**. **S** permite agacharse o bajar.
-- **Jugar** o una tecla de movimiento inicia el tiempo del juego. **P** pausa. **Espacio** reanuda sin pulsar ningún botón del príncipe.
-- **Nuevo nivel** crea otro mundo. El desplegable superior permite retomar cualquiera de los anteriores.
-- Pulsa una sala descubierta en el mapa para ver la última imagen guardada de tu visita. Al cerrar y volver a abrir, el juego continúa desde el último paso confirmado.
-- **Reintentar desde la entrada** empieza un intento nuevo en la misma geometría y conserva las salas descubiertas. Para salir, pisa la placa del último pasillo, sitúate frente a las escaleras y pulsa **W** una vez abierta la puerta.
-
-Para demostrar la memoria, entra en otra sala, pulsa **P**, cierra y vuelve a abrir. También puedes crear un segundo mundo y volver al primero desde la lista.
-
-## Cómo se construye el nivel
-
-1. **Una red con dos salidas.** Se amplió la CNN visual entrenada con las partidas del primer nivel. El checkpoint completo conserva la salida RGB y añade una salida que predice columnas de terreno. Las dos comparten el codificador de las últimas imágenes y la acción. Durante el ajuste espacial se congeló el predictor visual y se entrenó la nueva salida. La aplicación ejecuta en CPU la rama espacial exportada a ONNX.
-2. **Qué aprende.** El entrenamiento utiliza las capturas de la partición original de entrenamiento y recorridos de SDLPoP en 96 mundos producidos por el anterior generador estadístico. Este último proporciona ejemplos durante el entrenamiento. El decodificador predice diez columnas de tres casillas, de izquierda a derecha. Cada elección utiliza el contexto visual, las teclas, la dirección de entrada, el tipo de sala, la geometría vecina y las columnas ya generadas. La primera sala utiliza una observación inicial de referencia y una semilla propia.
-3. **Qué se fija con reglas.** El esqueleto del mundo reserva de cinco a ocho salas, un camino principal, un sótano y una salida. El modelo muestrea el relieve y el aspecto del interior. Se aseguran los bordes entre salas, el descansillo y la conexión entre placa y puerta. Al principio, las zonas desconocidas contienen pasillos provisionales para el motor. La interfaz los sustituye por el terreno neuronal antes de mostrar la primera imagen de cada nueva sala.
-4. **Jugabilidad y memoria.** Antes de aceptar una ampliación, SDLPoP debe completar una ruta por el mapa disponible, con pasillos provisionales en las zonas futuras. El programa vuelve a comprobar la ruta con cada ampliación. SQLite guarda la geometría, qué salas ha generado la red, la sala de origen, la acción, el paso y la última vista. La aplicación recupera las acciones con el motor y comprueba la imagen y el estado al reabrir. Puede haber una breve pausa al descubrir una sala, especialmente en partidas largas. Los mundos creados con la versión anterior siguen disponibles.
-
-## Comprobaciones
-
-La validación espacial usó 222 ejemplos de 12 mundos docentes reservados. La entropía cruzada por columna fue 1,079 frente a 2,022 de una referencia basada en frecuencias globales. Es una medida del ajuste a esos ejemplos. La jugabilidad se comprobó por separado directamente con el motor.
-
-Se jugaron ocho mundos neuronales con semillas 82000 a 82007. Los ocho tuvieron entradas distintas y llegaron a la salida. En cada uno se cruzó dos veces la misma frontera, se cerró y se reabrió la partida y se verificó la identidad del estado y de las salas conocidas. También se comprobó por separado el descenso y regreso desde el sótano en la semilla 82000.
-
-- [Entrenamiento y validación espacial](resultados/ajuste_espacial.json)
-- [Partidas de prueba del modelo neuronal](resultados/pruebas_salas.json)
-- [Memoria del generador neuronal](output/pdf/Memoria_generacion.pdf)
-- [Experimento inicial de predicción visual](PREDICCION.md)
-- [Grabaciones originales de las 120 partidas](https://github.com/salvachu/proyecto_final_generativos/releases/download/v1.0.0/Grabaciones_nivel1.tar.xz)
-
-## Ejecutar desde el código
-
-Con Python 3.13, Tk y el motor disponible en `runtime/SDLPoP`, estos comandos arrancan la aplicación y repiten las pruebas. En Windows el motor ya viene compilado en el ZIP. En Linux se puede compilar con el procedimiento de `sdlpop-recorder/README.md` en una carpeta nueva, y usar el resultado como `runtime/SDLPoP`.
-
-```text
-python -m pip install numpy Pillow h5py onnxruntime
-python explorar.py
-python comprobar_red.py
+```powershell
+.\Abrir_demo.cmd
 ```
 
-| Archivo | Función |
-| --- | --- |
-| `modelo.py` y `salas.py` | Red compartida, salida de terreno, muestreo y escritura de las salas. |
-| `entrenar_salas.py` y `niveles.py` | Entrenamiento espacial, generador docente y validación de recorridos con SDLPoP. |
-| `partidas.py` | Biblioteca de mundos, guardado por paso y recuperación verificada. |
-| `explorar.py` | Interfaz jugable y mapa de las visitas. |
-| `comprobar_red.py` | Pruebas reproducibles de generación, regreso y memoria. |
+En una instalación nueva, usa Python 3.13 con Tk y crea el entorno una sola vez. El repositorio incluye el motor compilado para Windows x64 y los pesos necesarios para jugar.
 
-Para reproducir el ajuste, instala `requirements.txt` y ejecuta `python entrenar_salas.py` desde la raíz. El checkpoint conjunto es `resultados/mundo_espacial.pt`; la aplicación carga `resultados/mundo_salas.onnx`. Los resultados de `comprobar_mundos.py` y `generacion.json` corresponden al generador estadístico de la versión anterior.
+```powershell
+py -3.13 -m venv .venv
+.\.venv\Scripts\python.exe -m pip install numpy Pillow h5py onnxruntime
+.\Abrir_demo.cmd
+```
 
-En Windows, el guardado está en `%LOCALAPPDATA%\PrinceOfPersiaMundos\mundos.sqlite3`. En Linux se usa `$XDG_DATA_HOME/prince-of-persia-mundos` o `~/.local/share/prince-of-persia-mundos`. Para llevar tus partidas a otro equipo, cierra la aplicación y copia la base de datos.
+- **Nivel 1 original** abre o reanuda el mapa original. **Generar nivel** prepara otra variante y la abre en cuanto SDLPoP comprueba un recorrido hasta la salida. Puedes retomar cada partida desde la lista.
+- **A / D** o las flechas mueven al príncipe. **W** salta y **W + Shift** permite agarrarse a un borde. **S** sirve para agacharse o bajar. Frente a la espada, mantén **Shift** para recogerla. En combate, **Shift** ataca y **W** bloquea. Ante la puerta abierta, pulsa **W** para salir.
+- **P** pausa o reanuda. **Espacio** reanuda en reposo. Un clic en una sala descubierta pausa el juego y lleva al príncipe allí. El viaje mantiene el inventario, la vida y las modificaciones del escenario. Reanuda con una tecla de movimiento.
+- **Reintentar desde la entrada** empieza otro intento y conserva las salas descubiertas. Cerrar la ventana guarda el último paso confirmado. En Windows, la biblioteca está en `%LOCALAPPDATA%\PrinceOfPersiaMundos\mundos.sqlite3`.
 
-El ZIP contiene el código del proyecto, la aplicación para Windows, el motor con su código fuente de compilación, el grabador de clase y el material de la primera fase. La compilación de la interfaz se hace con PyInstaller en modo directorio, con `explorar.py` como entrada y `sdlpop-recorder/src` en la ruta de módulos.
+## Qué genera el modelo
+
+La variante recupera la búsqueda de la espada hacia el oeste, los guardias, las trampas, las rutas a distintas alturas y la salida del nivel original. Se construye al crear el mundo y se descubre al recorrerlo. La semilla determina qué tramos se amplían y el punto de caída inicial y dónde aparece la espada dentro de su sala.
+
+1. La red espacial ONNX propone las diez columnas de cada galería nueva. Recibe imágenes reales del motor en una sala de referencia, las columnas de la vecina, la dirección y una acción de avance. Las galerías pueden extender los accesos al guardia o los dos pisos del sector occidental. En el acceso al guardia, el relieve propuesto sirve para situar un pozo con pinchos entre dos zonas de carrera y aterrizaje.
+2. Una segunda red, entrenada para reconstruir casillas ocultas de las salas del nivel 1, muestrea suelo, pilares, escombros, antorchas y partes del techo según las casillas próximas. El entrenamiento final usa las 21 salas del plano original. En una prueba previa con cuatro salas reservadas, la entropía cruzada fue 1,018.
+3. El ensamblado conserva la estructura de las salas de misión, los enlaces entre plantas y los mecanismos originales. El método combina terreno aprendido y diseño original. Antes de ofrecer cada mundo, un jugador automático debe llegar al evento nativo de fin de nivel con las teclas normales.
+4. SQLite guarda las acciones y los viajes. Al abrir una partida, la aplicación reproduce el historial y comprueba la imagen y el estado del motor. Se pueden retomar también los mundos de las versiones anteriores.
+
+## Reproducir las pruebas
+
+```powershell
+.\.venv\Scripts\python.exe comprobar_palacio.py
+```
+
+La prueba recorre el original y ocho mapas diferentes, verifica los enlaces bidireccionales y comprueba que solo se pueda viajar a salas conocidas desde la partida. También prueba la reanudación y, en encuentros aislados con el motor, la recogida de la espada y su uso frente a un guardia.
+
+Para reproducir el entrenamiento, instala `requirements.txt`. Ejecuta `entrenar_salas.py` para la red espacial y `entrenar_teselas.py` para el modelo de detalle. Los pesos de juego están en `resultados/mundo_salas.onnx` y `resultados/teselas_nivel1.npz`. En Linux compila el motor con el parche actualizado siguiendo `sdlpop-recorder/README.md` en una carpeta nueva.
+
+La primera versión generaba pasillos y un sótano al descubrirlos. Sus experimentos y entregables siguen disponibles en la [memoria de generación](output/pdf/Memoria_generacion.pdf), la [evaluación visual](PREDICCION.md) y la [entrega histórica v1.0.0](https://github.com/salvachu/proyecto_final_generativos/releases/tag/v1.0.0).
 
 ## Referencias
 
